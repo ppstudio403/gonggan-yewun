@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>공간여운 — 발주서</title>
+  <script>(function(){ if(!localStorage.getItem('ppstudio_user')) window.location.replace('login.html'); })();</script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{
+      --bg:#f5f3f0;--surface:#fff;--sidebar:#1c1917;--sidebar-hover:#292524;
+      --accent:#b5945a;--accent-light:#d4b483;--accent-pale:#f5ead8;
+      --text:#1c1917;--text-sub:#78716c;--text-muted:#a8a29e;--border:#e7e5e4;
+      --shadow-sm:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+      --radius:12px;--radius-sm:8px;
+    }
+    body{font-family:'Pretendard','Apple SD Gothic Neo','Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+    .header{background:var(--sidebar);height:64px;display:flex;align-items:center;padding:0 28px;gap:16px;flex-shrink:0;position:sticky;top:0;z-index:100;border-bottom:1px solid #292524;}
+    .header-brand{display:flex;align-items:center;gap:12px;}
+    .header-logo{width:36px;height:36px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;}
+    .header-brand-name{font-size:18px;font-weight:700;color:#fff;letter-spacing:-.3px;}
+    .header-brand-name span{color:var(--accent-light);}
+    .header-sep{flex:1;}
+    .header-date{font-size:13px;color:#57534e;}
+    .header-user{display:flex;align-items:center;gap:10px;}
+    .header-avatar{width:34px;height:34px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+    .header-user-name{font-size:14px;font-weight:600;color:#e7e5e4;}
+    .btn-logout{padding:7px 16px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:var(--radius-sm);color:#a8a29e;font-size:13px;font-weight:600;cursor:pointer;transition:background .15s,color .15s;}
+    .btn-logout:hover{background:rgba(255,255,255,.13);color:#e7e5e4;}
+    .layout{display:flex;flex:1;min-height:0;}
+    .sidebar{width:220px;background:var(--sidebar);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:64px;height:calc(100vh - 64px);overflow-y:auto;border-right:1px solid #292524;}
+    .sidebar-nav{flex:1;padding:16px 10px;display:flex;flex-direction:column;gap:2px;}
+    .nav-section-label{font-size:10px;font-weight:600;color:#57534e;letter-spacing:1px;text-transform:uppercase;padding:12px 12px 6px;margin-top:4px;}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--radius-sm);cursor:pointer;transition:background .15s,color .15s;color:#a8a29e;font-size:13.5px;font-weight:500;border:none;background:none;width:100%;text-align:left;text-decoration:none;}
+    .nav-item:hover{background:var(--sidebar-hover);color:#e7e5e4;}
+    .nav-item.active{background:rgba(181,148,90,.15);color:var(--accent-light);}
+    .nav-icon{font-size:16px;flex-shrink:0;}
+    .main{flex:1;min-width:0;overflow-y:auto;}
+    .content{padding:32px;display:flex;flex-direction:column;gap:24px;max-width:900px;}
+    .breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-muted);}
+    .breadcrumb a{color:var(--accent);font-weight:600;text-decoration:none;}
+    .breadcrumb a:hover{opacity:.75;}
+    .toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+    .page-title{font-size:22px;font-weight:700;color:var(--text);letter-spacing:-.3px;}
+    .project-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:var(--accent-pale);border-radius:20px;font-size:13px;font-weight:600;color:var(--accent);}
+    .toolbar-sep{flex:1;}
+.btn-new{display:flex;align-items:center;gap:6px;padding:9px 20px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13.5px;font-weight:700;cursor:pointer;transition:background .15s;white-space:nowrap;font-family:inherit;}
+    .btn-new:hover{background:#a07d44;}
+    .summary-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+    .summary-item{display:flex;flex-direction:column;gap:3px;}
+    .summary-label{font-size:11px;color:var(--text-muted);font-weight:600;letter-spacing:.3px;}
+    .summary-value{font-size:16px;font-weight:800;color:var(--text);}
+    .summary-sep{width:1px;height:36px;background:var(--border);flex-shrink:0;}
+    .status-tabs{display:flex;gap:4px;border-bottom:2px solid var(--border);}
+    .status-tab{padding:10px 22px;border:none;background:none;font-size:13.5px;font-weight:600;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s,border-color .15s;font-family:inherit;}
+    .status-tab:hover{color:var(--text);}
+    .status-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+    .tab-count{display:inline-block;background:var(--border);color:var(--text-sub);font-size:11px;font-weight:700;padding:1px 7px;border-radius:20px;margin-left:5px;}
+    .status-tab.active .tab-count{background:var(--accent-pale);color:var(--accent);}
+    .orders-list{display:flex;flex-direction:column;gap:10px;}
+    .order-card{background:var(--surface);border-radius:var(--radius);border:1.5px solid var(--border);box-shadow:var(--shadow-sm);cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .1s;display:flex;overflow:hidden;align-items:stretch;}
+    .order-card:hover{border-color:var(--accent);box-shadow:0 6px 20px rgba(181,148,90,.13);transform:translateY(-1px);}
+    .order-card-accent{width:10px;flex-shrink:0;background:var(--accent);}
+    .order-card-accent.done{background:var(--accent-light);opacity:.5;}
+    .order-card-body{flex:1;padding:14px 20px;display:flex;flex-direction:column;gap:5px;min-width:0;}
+    .order-card-row1{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+    .order-no{font-size:12.5px;font-weight:700;color:var(--text-sub);}
+    .status-badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:700;}
+    .badge-wait{background:#fffbeb;color:#d97706;}
+    .badge-done{background:#f0fdf4;color:#16a34a;}
+    .order-vendor{font-size:15.5px;font-weight:700;color:var(--text);}
+    .order-meta{font-size:12.5px;color:var(--text-muted);}
+    .order-cats{display:flex;gap:5px;flex-wrap:wrap;margin-top:3px;}
+    .cat-pill{font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:12px;}
+    .order-arrow{display:flex;align-items:center;padding:0 16px;font-size:20px;color:var(--text-muted);}
+    .empty-state{text-align:center;padding:60px 20px;color:var(--text-muted);}
+    .empty-icon{font-size:40px;margin-bottom:14px;}
+    .empty-text{font-size:15px;font-weight:600;color:var(--text-sub);margin-bottom:6px;}
+    .empty-sub{font-size:13px;}
+    @media(max-width:700px){.sidebar{display:none;}.content{padding:20px;}.header-date{display:none;}}
+  </style>
+</head>
+<body>
+<header class="header">
+  <div class="header-brand">
+    <div class="header-logo">GY</div>
+    <div class="header-brand-name">공간<span>여운</span></div>
+  </div>
+  <div class="header-sep"></div>
+  <div class="header-date" id="header-date"></div>
+  <div class="header-user">
+    <div class="header-avatar" id="user-avatar">관</div>
+    <div class="header-user-name" id="user-name">관리자</div>
+    <button class="btn-logout" id="logout-btn">로그아웃</button>
+  </div>
+</header>
+<div class="layout">
+  <aside class="sidebar">
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">업무</div>
+      <a class="nav-item" href="dashboard.html"><span class="nav-icon">🏠</span> 대시보드</a>
+      <a class="nav-item" href="projects.html"><span class="nav-icon">🏗️</span> 프로젝트 관리</a>
+      <a class="nav-item" href="consultation.html"><span class="nav-icon">📝</span> 회의록</a>
+      <a class="nav-item active" href="orders.html"><span class="nav-icon">📦</span> 발주서</a>
+      <button class="nav-item"><span class="nav-icon">🗓️</span> 일정</button>
+      <div class="nav-section-label">시스템</div>
+      <button class="nav-item"><span class="nav-icon">⚙️</span> 설정</button>
+    </nav>
+  </aside>
+  <main class="main">
+    <div class="content" id="content"></div>
+  </main>
+</div>
+<script>
+const user=JSON.parse(localStorage.getItem('ppstudio_user')||'null');
+if(!user)window.location.replace('login.html');
+document.getElementById('user-name').textContent=user.name;
+document.getElementById('user-avatar').textContent=user.name.charAt(0);
+document.getElementById('header-date').textContent=
+  new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'short'});
+document.getElementById('logout-btn').addEventListener('click',()=>{
+  localStorage.removeItem('ppstudio_user');window.location.href='login.html';
+});
+
+const CAT_STYLE={
+  '목자재':        'background:#fef3c7;color:#b45309;',
+  '타일자재':      'background:#eff6ff;color:#2563eb;',
+  '조명&전기기구': 'background:#fffbeb;color:#d97706;',
+  '페인트':        'background:#fff7ed;color:#c2410c;',
+  '도배':          'background:#f0fdf4;color:#15803d;',
+  '기타':          'background:#f4f4f5;color:#71717a;',
+};
+
+const INIT_ORDERS=[
+  {id:'PO-2026-001',projectId:'proj-001',vendor:'삼성목재',contact:'김대리',orderDate:'2026-01-20',deliveryDate:'2026-02-05',status:'납품완료',
+   categories:{'목자재':[{id:'i001',name:'각재',qty:50,note:''},{id:'i002',name:'합판',qty:20,note:'18T'}],'타일자재':[],'조명&전기기구':[],'페인트':[],'도배':[]},
+   memo:'현장 반입 시 1층 주차장 사용 가능',createdAt:'2026-01-20'},
+  {id:'PO-2026-002',projectId:'proj-001',vendor:'타일왕',contact:'박사장',orderDate:'2026-03-15',deliveryDate:'2026-04-01',status:'대기중',
+   categories:{'목자재':[],'타일자재':[{id:'i003',name:'바닥타일',qty:120,note:'600×600 헤링본'},{id:'i004',name:'줄눈재',qty:5,note:'2kg'}],'조명&전기기구':[],'페인트':[],'도배':[]},
+   memo:'',createdAt:'2026-03-15'},
+  {id:'PO-2026-003',projectId:'proj-002',vendor:'한빛조명',contact:'이부장',orderDate:'2026-02-20',deliveryDate:'2026-03-05',status:'대기중',
+   categories:{'목자재':[],'타일자재':[],'조명&전기기구':[{id:'i005',name:'메인조명',qty:12,note:'LED 60W 주광색'},{id:'i006',name:'간접조명',qty:8,note:'LED 스트립 5m'}],'페인트':[],'도배':[]},
+   memo:'설치 서비스 포함',createdAt:'2026-02-20'},
+];
+
+function loadOrders(){const r=localStorage.getItem('ppstudio_orders');if(!r){saveOrders(INIT_ORDERS);return JSON.parse(JSON.stringify(INIT_ORDERS));}return JSON.parse(r);}
+function saveOrders(l){localStorage.setItem('ppstudio_orders',JSON.stringify(l));}
+function loadProjects(){return JSON.parse(localStorage.getItem('ppstudio_projects')||'[]');}
+
+function itemCount(o){return Object.values(o.categories||{}).flat().filter(i=>i.name).length;}
+function catSummary(o){
+  return Object.entries(o.categories||{})
+    .filter(([,items])=>items.some(i=>i.name))
+    .map(([cat,items])=>{
+      const cnt=items.filter(i=>i.name).length;
+      const st=CAT_STYLE[cat]||CAT_STYLE['기타'];
+      return `<span class="cat-pill" style="${st}">${cat} ${cnt}</span>`;
+    }).join('');
+}
+function fmtDate(iso){if(!iso)return'-';const[y,m,d]=iso.split('-');return`${y}.${m}.${d}`;}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+const params=new URLSearchParams(location.search);
+let projectFilter=params.get('project')||'';
+let activeTab='wait';
+
+function render(){
+  const orders=loadOrders();
+  const projects=loadProjects();
+  const projMap={};projects.forEach(p=>projMap[p.id]=p.name);
+  const projectName=projectFilter?(projMap[projectFilter]||'알 수 없는 현장'):'';
+
+  const filtered=projectFilter?orders.filter(o=>o.projectId===projectFilter):orders;
+  const waiting=filtered.filter(o=>o.status==='대기중');
+  const done=filtered.filter(o=>o.status==='납품완료');
+  const shown=activeTab==='wait'?waiting:done;
+
+  const bc=projectFilter
+    ?`<div class="breadcrumb"><a href="project-detail.html?id=${esc(projectFilter)}">← 프로젝트 상세</a><span>/</span><span>발주서</span></div>`
+    :`<div class="breadcrumb"><a href="projects.html">← 프로젝트 관리</a><span>/</span><span>발주서 전체</span></div>`;
+
+  const filterEl=projectFilter?`<span class="project-chip">🏗️ ${esc(projectName)}</span>`:'';
+
+  let cardsHtml='';
+  if(shown.length===0){
+    cardsHtml=`<div class="empty-state"><div class="empty-icon">📦</div><div class="empty-text">${activeTab==='wait'?'대기 중인':'납품 완료된'} 발주서가 없습니다</div><div class="empty-sub">＋ 새 발주서 버튼으로 등록하세요</div></div>`;
+  } else {
+    cardsHtml=shown.map(o=>{
+      const isDone=o.status==='납품완료';
+      const summary=catSummary(o);
+      const projLabel=!projectFilter?`<span style="font-size:12px;color:var(--text-muted);">${esc(projMap[o.projectId]||'')}</span>`:'';
+      return `
+        <div class="order-card" data-id="${esc(o.id)}">
+          <div class="order-card-accent${isDone?' done':''}"></div>
+          <div class="order-card-body">
+            <div class="order-card-row1">
+              <span class="order-no">${esc(o.id)}</span>
+              <span class="status-badge ${isDone?'badge-done':'badge-wait'}">${esc(o.status)}</span>
+              ${projLabel}
+            </div>
+            <div class="order-vendor">${esc(o.vendor)}</div>
+            <div class="order-meta">${o.contact?'담당: '+esc(o.contact)+'&nbsp;·&nbsp;':''}발주 ${fmtDate(o.orderDate)} → 납품예정 ${fmtDate(o.deliveryDate)}</div>
+            <div class="order-cats">${summary||'<span style="font-size:12px;color:var(--text-muted);">품목 없음</span>'}</div>
+          </div>
+          <div class="order-arrow">›</div>
+        </div>`;
+    }).join('');
+  }
+
+  document.getElementById('content').innerHTML=`
+    ${bc}
+    <div class="toolbar">
+      <span class="page-title">발주서</span>
+      ${filterEl}
+      <div class="toolbar-sep"></div>
+      <button class="btn-new" id="btn-new">＋ 새 발주서</button>
+    </div>
+    <div class="summary-bar">
+      <div class="summary-item"><div class="summary-label">대기중</div><div class="summary-value">${waiting.length}건</div></div>
+      <div class="summary-sep"></div>
+      <div class="summary-item"><div class="summary-label">납품완료</div><div class="summary-value">${done.length}건</div></div>
+      <div class="summary-sep"></div>
+      <div class="summary-item"><div class="summary-label">전체</div><div class="summary-value">${filtered.length}건</div></div>
+    </div>
+    <div class="status-tabs">
+      <button class="status-tab${activeTab==='wait'?' active':''}" data-tab="wait">대기중 <span class="tab-count">${waiting.length}</span></button>
+      <button class="status-tab${activeTab==='done'?' active':''}" data-tab="done">납품완료 <span class="tab-count">${done.length}</span></button>
+    </div>
+    <div class="orders-list">${cardsHtml}</div>
+  `;
+
+  document.getElementById('btn-new').addEventListener('click',()=>{
+    const q=projectFilter?'?new=true&project='+projectFilter:'?new=true';
+    window.location.href='order-detail.html'+q;
+  });
+  document.querySelectorAll('.status-tab').forEach(btn=>{
+    btn.addEventListener('click',function(){activeTab=this.dataset.tab;render();});
+  });
+  document.querySelectorAll('.order-card').forEach(card=>{
+    card.addEventListener('click',function(){window.location.href='order-detail.html?id='+this.dataset.id;});
+  });
+}
+
+render();
+</script>
+</body>
+</html>

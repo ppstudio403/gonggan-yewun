@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>공간여운 — 회의록</title>
+  <script>
+    (function () { if (!localStorage.getItem('ppstudio_user')) window.location.replace('login.html'); })();
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f5f3f0; --surface: #ffffff; --sidebar: #1c1917; --sidebar-hover: #292524;
+      --accent: #b5945a; --accent-light: #d4b483; --accent-pale: #f5ead8;
+      --text: #1c1917; --text-sub: #78716c; --text-muted: #a8a29e; --border: #e7e5e4;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+      --radius: 12px; --radius-sm: 8px;
+    }
+    body { font-family: 'Pretendard','Apple SD Gothic Neo','Noto Sans KR',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; display:flex; flex-direction:column; }
+
+    /* ── HEADER ── */
+    .header { background:var(--sidebar); height:64px; display:flex; align-items:center; padding:0 28px; gap:16px; flex-shrink:0; position:sticky; top:0; z-index:100; border-bottom:1px solid #292524; }
+    .header-brand { display:flex; align-items:center; gap:12px; }
+    .header-logo { width:36px; height:36px; background:var(--accent); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:800; color:#fff; flex-shrink:0; }
+    .header-brand-name { font-size:18px; font-weight:700; color:#fff; letter-spacing:-.3px; }
+    .header-brand-name span { color:var(--accent-light); }
+    .header-sep { flex:1; }
+    .header-date { font-size:13px; color:#57534e; }
+    .header-user { display:flex; align-items:center; gap:10px; }
+    .header-avatar { width:34px; height:34px; background:var(--accent); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#fff; flex-shrink:0; }
+    .header-user-name { font-size:14px; font-weight:600; color:#e7e5e4; }
+    .btn-logout { padding:7px 16px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); border-radius:var(--radius-sm); color:#a8a29e; font-size:13px; font-weight:600; cursor:pointer; transition:background .15s,color .15s; }
+    .btn-logout:hover { background:rgba(255,255,255,.13); color:#e7e5e4; }
+
+    /* ── LAYOUT ── */
+    .layout { display:flex; flex:1; min-height:0; }
+    .sidebar { width:220px; background:var(--sidebar); display:flex; flex-direction:column; flex-shrink:0; position:sticky; top:64px; height:calc(100vh - 64px); overflow-y:auto; border-right:1px solid #292524; }
+    .sidebar-nav { flex:1; padding:16px 10px; display:flex; flex-direction:column; gap:2px; }
+    .nav-section-label { font-size:10px; font-weight:600; color:#57534e; letter-spacing:1px; text-transform:uppercase; padding:12px 12px 6px; margin-top:4px; }
+    .nav-item { display:flex; align-items:center; gap:10px; padding:10px 14px; border-radius:var(--radius-sm); cursor:pointer; transition:background .15s,color .15s; color:#a8a29e; font-size:13.5px; font-weight:500; border:none; background:none; width:100%; text-align:left; text-decoration:none; }
+    .nav-item:hover { background:var(--sidebar-hover); color:#e7e5e4; }
+    .nav-item.active { background:rgba(181,148,90,.15); color:var(--accent-light); }
+    .nav-icon { font-size:16px; flex-shrink:0; }
+    .main { flex:1; min-width:0; overflow-y:auto; }
+    .content { padding:32px; display:flex; flex-direction:column; gap:24px; max-width:980px; }
+
+    /* ── TOOLBAR ── */
+    .toolbar { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .page-title { font-size:22px; font-weight:700; color:var(--text); letter-spacing:-.3px; margin-right:4px; }
+    .toolbar-sep { flex:1; }
+    .form-select-sm { padding:8px 14px; border:1.5px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); font-size:13.5px; color:var(--text); outline:none; cursor:pointer; font-family:inherit; transition:border-color .15s; }
+    .form-select-sm:focus { border-color:var(--accent); }
+    .btn-new { display:flex; align-items:center; gap:6px; padding:9px 20px; background:var(--accent); color:#fff; border:none; border-radius:var(--radius-sm); font-size:13.5px; font-weight:700; cursor:pointer; transition:background .15s; white-space:nowrap; font-family:inherit; }
+    .btn-new:hover { background:#a07d44; }
+
+    /* ── MEETING LIST ── */
+    .project-group { display:flex; flex-direction:column; gap:12px; }
+    .group-header { display:flex; align-items:center; gap:14px; }
+    .group-title { font-size:15px; font-weight:700; color:var(--text); white-space:nowrap; }
+    .group-line { flex:1; height:1.5px; background:var(--border); }
+    .group-count { font-size:12px; color:var(--text-muted); white-space:nowrap; }
+
+    .meeting-card { background:var(--surface); border-radius:var(--radius); border:1.5px solid var(--border); box-shadow:var(--shadow-sm); cursor:pointer; transition:border-color .15s,box-shadow .15s,transform .1s; overflow:hidden; display:flex; }
+    .meeting-card:hover { border-color:var(--accent); box-shadow:0 6px 20px rgba(181,148,90,.13); transform:translateY(-1px); }
+    .meeting-card-date { width:88px; flex-shrink:0; background:var(--sidebar); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; padding:16px 8px; }
+    .mdate-month { font-size:11px; font-weight:600; color:var(--accent-light); letter-spacing:.5px; }
+    .mdate-day { font-size:26px; font-weight:800; color:#fff; line-height:1; }
+    .mdate-year { font-size:10.5px; color:#78716c; }
+    .meeting-card-body { flex:1; padding:14px 18px; display:flex; flex-direction:column; gap:8px; min-width:0; }
+    .card-row1 { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .method-badge { display:inline-flex; align-items:center; padding:2px 10px; border-radius:20px; font-size:11.5px; font-weight:700; flex-shrink:0; }
+    .meeting-attendees { font-size:13px; color:var(--text-sub); }
+    .meeting-topics { font-size:12.5px; color:var(--text-muted); }
+    .meeting-memo-preview { font-size:12.5px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .meeting-card-arrow { display:flex; align-items:center; padding:0 16px; color:var(--text-muted); font-size:18px; flex-shrink:0; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state { text-align:center; padding:80px 20px; color:var(--text-muted); }
+    .empty-icon { font-size:44px; margin-bottom:16px; }
+    .empty-text { font-size:15px; font-weight:600; color:var(--text-sub); margin-bottom:6px; }
+    .empty-sub  { font-size:13px; }
+
+    /* ── FORM VIEW ── */
+    .form-header { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+    .form-header-left { display:flex; align-items:center; gap:14px; }
+    .btn-back { display:flex; align-items:center; gap:6px; color:var(--accent); font-size:13.5px; font-weight:600; text-decoration:none; cursor:pointer; background:none; border:none; font-family:inherit; padding:0; transition:opacity .15s; }
+    .btn-back:hover { opacity:.75; }
+    .form-title { font-size:22px; font-weight:700; color:var(--text); }
+    .form-header-right { display:flex; align-items:center; gap:10px; }
+    .btn-save-form { padding:10px 24px; background:var(--accent); color:#fff; border:none; border-radius:var(--radius-sm); font-size:13.5px; font-weight:700; cursor:pointer; transition:background .15s; font-family:inherit; }
+    .btn-save-form:hover { background:#a07d44; }
+    .btn-cancel-form { padding:10px 18px; border:1.5px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text-sub); font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:background .15s; }
+    .btn-cancel-form:hover { background:var(--bg); }
+
+    /* ── FORM SECTIONS ── */
+    .form-card { background:var(--surface); border-radius:var(--radius); border:1px solid var(--border); box-shadow:var(--shadow-sm); overflow:hidden; }
+    .form-card-title { font-size:13px; font-weight:700; color:var(--text-muted); letter-spacing:.6px; text-transform:uppercase; padding:16px 22px 12px; border-bottom:1px solid var(--border); background:#faf9f8; }
+    .form-card-body { padding:20px 22px; display:flex; flex-direction:column; gap:16px; }
+
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .form-full { grid-column:1/-1; }
+    .form-group { display:flex; flex-direction:column; gap:7px; }
+    .form-label { font-size:12.5px; font-weight:600; color:var(--text); }
+    .form-label .req { color:#dc2626; margin-left:2px; }
+    .form-input, .form-select, .form-textarea { padding:10px 14px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-size:13.5px; color:var(--text); background:var(--bg); outline:none; transition:border-color .2s,box-shadow .2s; font-family:inherit; width:100%; }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(181,148,90,.1); background:#fff; }
+    .form-input::placeholder, .form-textarea::placeholder { color:var(--text-muted); }
+    .form-textarea { resize:vertical; min-height:90px; line-height:1.6; }
+
+    /* method buttons */
+    .method-btns { display:flex; gap:8px; flex-wrap:wrap; }
+    .method-btn { padding:9px 22px; border:1.5px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); font-size:13.5px; font-weight:600; color:var(--text-sub); cursor:pointer; transition:all .15s; font-family:inherit; }
+    .method-btn:hover { border-color:var(--accent); color:var(--accent); }
+    .method-btn.selected { background:var(--accent-pale); border-color:var(--accent); color:var(--accent); font-weight:700; }
+
+    /* attendees */
+    .attendee-others-list { display:flex; flex-direction:column; gap:8px; }
+    .attendee-row { display:flex; gap:8px; align-items:center; }
+    .attendee-row .form-input { flex:1; }
+    .btn-del-attendee { width:32px; height:32px; display:flex; align-items:center; justify-content:center; border:1.5px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text-muted); font-size:16px; cursor:pointer; flex-shrink:0; transition:background .15s,color .15s; }
+    .btn-del-attendee:hover { background:#fff1f2; color:#dc2626; border-color:#fecaca; }
+    .btn-add-sm { display:inline-flex; align-items:center; gap:5px; padding:7px 14px; border:1.5px dashed var(--border); border-radius:var(--radius-sm); background:transparent; color:var(--text-muted); font-size:13px; font-weight:600; cursor:pointer; transition:all .15s; font-family:inherit; }
+    .btn-add-sm:hover { border-color:var(--accent); color:var(--accent); }
+
+    /* topics */
+    .topics-list { display:flex; flex-direction:column; gap:12px; }
+    .topic-block { border:1.5px solid var(--border); border-left:3px solid var(--accent); border-radius:var(--radius-sm); background:var(--surface); overflow:hidden; }
+    .topic-header { display:flex; align-items:center; gap:10px; padding:12px 14px; background:#faf9f8; border-bottom:1px solid var(--border); }
+    .topic-cat { flex:1; padding:7px 10px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-size:13.5px; color:var(--text); background:var(--surface); outline:none; font-family:inherit; cursor:pointer; }
+    .topic-cat:focus { border-color:var(--accent); }
+    .btn-del-topic { padding:5px 12px; border:1.5px solid #fecaca; border-radius:var(--radius-sm); background:#fff1f2; color:#dc2626; font-size:12px; font-weight:600; cursor:pointer; flex-shrink:0; font-family:inherit; transition:background .15s; }
+    .btn-del-topic:hover { background:#fee2e2; }
+    .subtopics-list { padding:12px 14px; display:flex; flex-direction:column; gap:10px; }
+    .subtopic-block { display:flex; flex-direction:column; gap:7px; padding:10px 12px; background:var(--bg); border-radius:var(--radius-sm); border:1px solid var(--border); }
+    .subtopic-row1 { display:flex; align-items:center; gap:8px; }
+    .sub-label { font-size:10.5px; font-weight:700; color:var(--text-muted); letter-spacing:.5px; flex-shrink:0; }
+    .sub-title { flex:1; padding:7px 10px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-size:13.5px; color:var(--text); background:var(--surface); outline:none; font-family:inherit; }
+    .sub-title:focus { border-color:var(--accent); box-shadow:0 0 0 2px rgba(181,148,90,.1); background:#fff; }
+    .sub-title::placeholder { color:var(--text-muted); }
+    .btn-del-sub { width:28px; height:28px; display:flex; align-items:center; justify-content:center; border:1.5px solid var(--border); border-radius:6px; background:var(--surface); color:var(--text-muted); font-size:14px; cursor:pointer; flex-shrink:0; transition:all .15s; }
+    .btn-del-sub:hover { background:#fff1f2; color:#dc2626; border-color:#fecaca; }
+    .sub-content { padding:8px 10px; border:1.5px solid var(--border); border-radius:var(--radius-sm); font-size:13px; color:var(--text); background:var(--surface); outline:none; font-family:inherit; resize:vertical; min-height:70px; line-height:1.6; }
+    .sub-content:focus { border-color:var(--accent); box-shadow:0 0 0 2px rgba(181,148,90,.1); background:#fff; }
+    .sub-content::placeholder { color:var(--text-muted); }
+    .topic-footer { padding:8px 14px 12px; display:flex; gap:8px; }
+    .btn-add-sub-topic { display:inline-flex; align-items:center; gap:4px; padding:5px 12px; border:1.5px dashed var(--border); border-radius:var(--radius-sm); background:transparent; color:var(--text-muted); font-size:12.5px; font-weight:600; cursor:pointer; transition:all .15s; font-family:inherit; }
+    .btn-add-sub-topic:hover { border-color:var(--accent); color:var(--accent); }
+    .btn-add-topic-outer { display:inline-flex; align-items:center; gap:6px; padding:10px 18px; border:2px dashed var(--border); border-radius:var(--radius-sm); background:transparent; color:var(--text-muted); font-size:13.5px; font-weight:600; cursor:pointer; transition:all .15s; font-family:inherit; width:100%; justify-content:center; }
+    .btn-add-topic-outer:hover { border-color:var(--accent); color:var(--accent); }
+
+    /* images */
+    .image-grid { display:flex; gap:10px; flex-wrap:wrap; align-items:flex-start; }
+    .image-thumb { position:relative; width:88px; height:88px; border-radius:var(--radius-sm); overflow:hidden; border:1.5px solid var(--border); flex-shrink:0; }
+    .image-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+    .btn-del-img { position:absolute; top:4px; right:4px; width:22px; height:22px; background:rgba(0,0,0,.55); border:none; border-radius:50%; color:#fff; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1; transition:background .15s; }
+    .btn-del-img:hover { background:rgba(220,38,38,.8); }
+    .image-upload-label { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; width:88px; height:88px; border:2px dashed var(--border); border-radius:var(--radius-sm); cursor:pointer; color:var(--text-muted); font-size:22px; transition:border-color .15s,color .15s; flex-shrink:0; }
+    .image-upload-label:hover { border-color:var(--accent); color:var(--accent); }
+    .image-upload-label span { font-size:11px; font-weight:600; }
+
+    /* ── BREADCRUMB ── */
+    .breadcrumb { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--text-muted); }
+    .breadcrumb a { color:var(--accent); font-weight:600; text-decoration:none; transition:opacity .15s; }
+    .breadcrumb a:hover { opacity:.75; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width:700px) {
+      .sidebar { display:none; }
+      .content { padding:20px; }
+      .form-row { grid-template-columns:1fr; }
+      .header-date { display:none; }
+      .meeting-card-date { width:70px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header class="header">
+  <div class="header-brand">
+    <div class="header-logo">GY</div>
+    <div class="header-brand-name">공간<span>여운</span></div>
+  </div>
+  <div class="header-sep"></div>
+  <div class="header-date" id="header-date"></div>
+  <div class="header-user">
+    <div class="header-avatar" id="user-avatar">관</div>
+    <div class="header-user-name" id="user-name">관리자</div>
+    <button class="btn-logout" id="logout-btn">로그아웃</button>
+  </div>
+</header>
+
+<div class="layout">
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="sidebar">
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">업무</div>
+      <a class="nav-item" href="dashboard.html"><span class="nav-icon">🏠</span> 대시보드</a>
+      <a class="nav-item" href="projects.html"><span class="nav-icon">🏗️</span> 프로젝트 관리</a>
+      <a class="nav-item active" href="consultation.html"><span class="nav-icon">📝</span> 회의록</a>
+      <a class="nav-item" href="orders.html"><span class="nav-icon">📦</span> 발주서</a>
+      <button class="nav-item"><span class="nav-icon">🗓️</span> 일정</button>
+      <div class="nav-section-label">시스템</div>
+      <button class="nav-item"><span class="nav-icon">⚙️</span> 설정</button>
+    </nav>
+  </aside>
+
+  <!-- ═══ MAIN ═══ -->
+  <main class="main">
+    <div class="content" id="view-container"></div>
+  </main>
+</div>
+
+<script>
+/* ════════════════════════════════════════
+   INIT
+════════════════════════════════════════ */
+const user = JSON.parse(localStorage.getItem('ppstudio_user') || 'null');
+if (!user) window.location.replace('login.html');
+
+document.getElementById('user-name').textContent   = user.name;
+document.getElementById('user-avatar').textContent = user.name.charAt(0);
+document.getElementById('header-date').textContent =
+  new Date().toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric', weekday:'short' });
+document.getElementById('logout-btn').addEventListener('click', () => {
+  localStorage.removeItem('ppstudio_user');
+  window.location.href = 'login.html';
+});
+
+/* ════════════════════════════════════════
+   CONFIG
+════════════════════════════════════════ */
+const CATEGORIES = ['공간 계획','디자인 컨셉','자재 선정','가구/조명','시공 범위','일정 협의','견적/계약','AS/하자'];
+const METHODS    = ['방문','전화','카카오톡'];
+const METHOD_STYLE = {
+  '방문':    { bg:'#eff6ff', color:'#2563eb' },
+  '전화':    { bg:'#f0fdf4', color:'#16a34a' },
+  '카카오톡': { bg:'#fffbeb', color:'#d97706' },
+};
+
+/* ════════════════════════════════════════
+   STATE
+════════════════════════════════════════ */
+const initParams   = new URLSearchParams(location.search);
+let view           = 'list';
+let editingId      = null;
+let projectFilter  = initParams.get('project') || '';
+let formImages     = [];   // { id, dataUrl }
+let selectedMethod = '방문';
+
+/* ════════════════════════════════════════
+   DATA
+════════════════════════════════════════ */
+const INIT_MEETINGS = [
+  {
+    id:'mtg-001', projectId:'proj-001',
+    date:'2026-01-15', method:'방문',
+    attendees:{ client:'김민수', designer:'이지연', others:[] },
+    topics:[
+      { id:'tp-001', category:'공간 계획', subtopics:[
+        { id:'sb-001', title:'주방 레이아웃', content:'아일랜드 형식으로 최종 결정. 냉장고는 좌측 배치.' },
+        { id:'sb-002', title:'좌석 배치', content:'4인 테이블 2개 + 바 카운터 형식 검토 중.' },
+      ]},
+      { id:'tp-002', category:'자재 선정', subtopics:[
+        { id:'sb-003', title:'바닥재', content:'헤링본 패턴 원목마루 (화이트오크 계열) 선호.' },
+      ]},
+    ],
+    images:[], memo:'2차 미팅은 2주 후 예정. 가견적 검토 요청.',
+  },
+  {
+    id:'mtg-002', projectId:'proj-001',
+    date:'2026-03-10', method:'전화',
+    attendees:{ client:'김민수', designer:'이지연', others:[] },
+    topics:[
+      { id:'tp-003', category:'일정 협의', subtopics:[
+        { id:'sb-004', title:'시공 시작일 조정', content:'6월 말 → 7월 1일로 변경 합의.' },
+      ]},
+    ],
+    images:[], memo:'계약서 수정본 이메일로 발송 예정.',
+  },
+  {
+    id:'mtg-003', projectId:'proj-002',
+    date:'2026-02-18', method:'방문',
+    attendees:{ client:'박철수', designer:'최수진', others:['이과장'] },
+    topics:[
+      { id:'tp-004', category:'디자인 컨셉', subtopics:[
+        { id:'sb-005', title:'전체 컨셉', content:'모던 미니멀리즘. 화이트+우드 그레이 계열.' },
+      ]},
+      { id:'tp-005', category:'견적/계약', subtopics:[
+        { id:'sb-006', title:'예산 범위', content:'총 예산 2,400만원 내 진행 확정.' },
+      ]},
+    ],
+    images:[], memo:'',
+  },
+];
+
+function loadMeetings() {
+  const raw = localStorage.getItem('ppstudio_meetings');
+  if (!raw) { saveMeetings(INIT_MEETINGS); return INIT_MEETINGS.slice(); }
+  return JSON.parse(raw);
+}
+function saveMeetings(list) { localStorage.setItem('ppstudio_meetings', JSON.stringify(list)); }
+function loadProjects() { return JSON.parse(localStorage.getItem('ppstudio_projects') || '[]'); }
+
+/* ════════════════════════════════════════
+   UTILS
+════════════════════════════════════════ */
+function fmtDateFull(iso) {
+  if (!iso) return '';
+  return new Date(iso).toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric' });
+}
+function parseDateParts(iso) {
+  if (!iso) return { y:'', m:'', d:'' };
+  const [y,m,d] = iso.split('-');
+  return { y, m: parseInt(m), d: parseInt(d) };
+}
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ════════════════════════════════════════
+   LIST VIEW
+════════════════════════════════════════ */
+function renderList() {
+  const vc       = document.getElementById('view-container');
+  const projects = loadProjects();
+  const meetings = loadMeetings();
+
+  const projectMap = {};
+  projects.forEach(p => { projectMap[p.id] = p.name; });
+
+  const filtered = projectFilter
+    ? meetings.filter(m => m.projectId === projectFilter)
+    : meetings;
+
+  filtered.sort((a,b) => b.date.localeCompare(a.date));
+
+  /* project dropdown options */
+  const projOpts = projects.map(p =>
+    `<option value="${esc(p.id)}" ${projectFilter===p.id?'selected':''}>${esc(p.name)}</option>`
+  ).join('');
+
+  /* group by project */
+  const groups = {};
+  filtered.forEach(m => {
+    const key = m.projectId;
+    (groups[key] = groups[key] || []).push(m);
+  });
+
+  let groupsHtml = '';
+  if (filtered.length === 0) {
+    groupsHtml = `
+      <div class="empty-state">
+        <div class="empty-icon">📝</div>
+        <div class="empty-text">회의록이 없습니다</div>
+        <div class="empty-sub">＋ 새 회의록 버튼으로 작성해보세요</div>
+      </div>`;
+  } else {
+    Object.keys(groups).forEach(pid => {
+      const list = groups[pid];
+      const projName = projectMap[pid] || '알 수 없는 프로젝트';
+      groupsHtml += `
+        <div class="project-group">
+          <div class="group-header">
+            <div class="group-title">🏗️ ${esc(projName)}</div>
+            <div class="group-line"></div>
+            <div class="group-count">${list.length}건</div>
+          </div>
+          ${list.map(m => renderMeetingCard(m)).join('')}
+        </div>`;
+    });
+  }
+
+  vc.innerHTML = `
+    <div class="toolbar">
+      <span class="page-title">회의록</span>
+      <select class="form-select-sm" id="proj-filter-select">
+        <option value="">전체 프로젝트</option>
+        ${projOpts}
+      </select>
+      <div class="toolbar-sep"></div>
+      <button class="btn-new" id="btn-new-meeting">＋ 새 회의록</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:28px;">${groupsHtml}</div>
+  `;
+
+  document.getElementById('proj-filter-select').addEventListener('change', function() {
+    projectFilter = this.value;
+    renderList();
+  });
+  document.getElementById('btn-new-meeting').addEventListener('click', () => {
+    editingId = null;
+    view = 'form';
+    formImages = [];
+    selectedMethod = '방문';
+    renderForm();
+  });
+  vc.querySelectorAll('.meeting-card').forEach(card => {
+    card.addEventListener('click', function() {
+      editingId = this.dataset.id;
+      view = 'form';
+      const m = loadMeetings().find(x => x.id === editingId);
+      formImages = (m?.images || []).map(img => ({ id: img.id, dataUrl: img.dataUrl }));
+      selectedMethod = m?.method || '방문';
+      renderForm();
+    });
+  });
+}
+
+function renderMeetingCard(m) {
+  const dp   = parseDateParts(m.date);
+  const ms   = METHOD_STYLE[m.method] || { bg:'#f1f5f9', color:'#64748b' };
+  const att  = [m.attendees?.client, m.attendees?.designer, ...(m.attendees?.others || [])].filter(Boolean);
+  const cats = [...new Set((m.topics || []).map(t => t.category))];
+  return `
+    <div class="meeting-card" data-id="${esc(m.id)}">
+      <div class="meeting-card-date">
+        <div class="mdate-month">${dp.m}월</div>
+        <div class="mdate-day">${dp.d}</div>
+        <div class="mdate-year">${dp.y}</div>
+      </div>
+      <div class="meeting-card-body">
+        <div class="card-row1">
+          <span class="method-badge" style="background:${ms.bg};color:${ms.color};">${esc(m.method)}</span>
+        </div>
+        <div class="meeting-attendees">👥 ${esc(att.join(' · ') || '참석자 미입력')}</div>
+        ${cats.length ? `<div class="meeting-topics">📋 ${esc(cats.join(' · '))}</div>` : ''}
+        ${m.memo ? `<div class="meeting-memo-preview">💬 ${esc(m.memo)}</div>` : ''}
+      </div>
+      <div class="meeting-card-arrow">›</div>
+    </div>`;
+}
+
+/* ════════════════════════════════════════
+   FORM VIEW
+════════════════════════════════════════ */
+function renderForm() {
+  const vc       = document.getElementById('view-container');
+  const projects = loadProjects();
+  const meetings = loadMeetings();
+  const m        = editingId ? meetings.find(x => x.id === editingId) : null;
+
+  const projOpts = projects.map(p =>
+    `<option value="${esc(p.id)}" ${(m?.projectId||projectFilter)===p.id?'selected':''}>${esc(p.name)}</option>`
+  ).join('');
+
+  vc.innerHTML = `
+    <!-- 헤더 -->
+    <div class="form-header">
+      <div class="form-header-left">
+        <button class="btn-back" id="btn-back-list">← 목록으로</button>
+        <span class="form-title">${editingId ? '회의록 수정' : '새 회의록 작성'}</span>
+      </div>
+      <div class="form-header-right">
+        ${editingId ? `<button class="btn-cancel-form" id="btn-delete-meeting" style="border-color:#fecaca;color:#dc2626;">삭제</button>` : ''}
+        <button class="btn-cancel-form" id="btn-cancel-form">취소</button>
+        <button class="btn-save-form" id="btn-save-form">저장하기</button>
+      </div>
+    </div>
+
+    <!-- 기본 정보 -->
+    <div class="form-card">
+      <div class="form-card-title">기본 정보</div>
+      <div class="form-card-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">날짜 <span class="req">*</span></label>
+            <input class="form-input" id="f-date" type="date" value="${esc(m?.date || new Date().toISOString().slice(0,10))}" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">프로젝트 <span class="req">*</span></label>
+            <select class="form-select" id="f-project">
+              <option value="">프로젝트 선택</option>
+              ${projOpts}
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">상담 방식</label>
+          <div class="method-btns" id="method-btns">
+            ${METHODS.map(mt => `<button class="method-btn${(m?.method||selectedMethod)===mt?' selected':''}" data-method="${esc(mt)}">${esc(mt)}</button>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 참석자 -->
+    <div class="form-card">
+      <div class="form-card-title">참석자</div>
+      <div class="form-card-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">고객명</label>
+            <input class="form-input" id="f-client" placeholder="고객 이름" value="${esc(m?.attendees?.client||'')}" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">담당 디자이너</label>
+            <input class="form-input" id="f-designer" placeholder="디자이너 이름" value="${esc(m?.attendees?.designer||'')}" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">추가 참석자</label>
+          <div class="attendee-others-list" id="attendee-others"></div>
+          <button class="btn-add-sm" id="btn-add-attendee" style="margin-top:6px;">＋ 참석자 추가</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 대주제 & 소주제 -->
+    <div class="form-card">
+      <div class="form-card-title">대주제 &amp; 소주제</div>
+      <div class="form-card-body">
+        <div class="topics-list" id="topics-list"></div>
+        <button class="btn-add-topic-outer" id="btn-add-topic">＋ 대주제 추가</button>
+      </div>
+    </div>
+
+    <!-- 참고 이미지 -->
+    <div class="form-card">
+      <div class="form-card-title">참고 이미지</div>
+      <div class="form-card-body">
+        <div class="image-grid" id="image-grid"></div>
+        <input type="file" id="image-input" accept="image/*" multiple hidden />
+      </div>
+    </div>
+
+    <!-- 특이사항/메모 -->
+    <div class="form-card">
+      <div class="form-card-title">특이사항 / 메모</div>
+      <div class="form-card-body">
+        <textarea class="form-textarea" id="f-memo" placeholder="특이사항이나 추가 메모를 입력하세요" style="min-height:110px;">${esc(m?.memo||'')}</textarea>
+      </div>
+    </div>
+  `;
+
+  /* 초기 데이터 주입 */
+  (m?.attendees?.others || []).forEach(name => addAttendeeRow(name));
+  (m?.topics || []).forEach(t => addTopicBlock(t));
+  renderImageGrid();
+
+  /* 이벤트 바인딩 */
+  document.getElementById('btn-back-list').addEventListener('click', () => { view='list'; renderList(); });
+  document.getElementById('btn-cancel-form').addEventListener('click', () => { view='list'; renderList(); });
+  document.getElementById('btn-add-attendee').addEventListener('click', () => addAttendeeRow(''));
+  document.getElementById('btn-add-topic').addEventListener('click', () => addTopicBlock(null));
+  document.getElementById('btn-save-form').addEventListener('click', saveForm);
+  document.getElementById('image-input').addEventListener('change', function() { handleImageUpload(this.files); this.value=''; });
+
+  /* method 버튼 */
+  document.getElementById('method-btns').addEventListener('click', function(e) {
+    const btn = e.target.closest('.method-btn');
+    if (!btn) return;
+    document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedMethod = btn.dataset.method;
+  });
+
+  /* 삭제 버튼 */
+  const btnDel = document.getElementById('btn-delete-meeting');
+  if (btnDel) {
+    btnDel.addEventListener('click', () => {
+      if (!confirm('이 회의록을 삭제하시겠습니까?')) return;
+      const list = loadMeetings().filter(x => x.id !== editingId);
+      saveMeetings(list);
+      view = 'list';
+      renderList();
+    });
+  }
+}
+
+/* ════════════════════════════════════════
+   FORM DYNAMICS
+════════════════════════════════════════ */
+
+/* 참석자 */
+function addAttendeeRow(name) {
+  const container = document.getElementById('attendee-others');
+  const row = document.createElement('div');
+  row.className = 'attendee-row';
+  row.innerHTML = `
+    <input class="form-input" placeholder="추가 참석자 이름" value="${esc(name)}" />
+    <button class="btn-del-attendee" title="삭제">×</button>`;
+  row.querySelector('.btn-del-attendee').addEventListener('click', () => row.remove());
+  container.appendChild(row);
+}
+
+/* 대주제 블록 */
+function addTopicBlock(data) {
+  const list    = document.getElementById('topics-list');
+  const topicId = data?.id || ('tp-' + Date.now());
+  const block   = document.createElement('div');
+  block.className   = 'topic-block';
+  block.dataset.topicId = topicId;
+
+  const catOpts = CATEGORIES.map(c =>
+    `<option${(data?.category===c)?' selected':''}>${esc(c)}</option>`
+  ).join('');
+
+  block.innerHTML = `
+    <div class="topic-header">
+      <select class="topic-cat">${catOpts}</select>
+      <button class="btn-del-topic">× 대주제 삭제</button>
+    </div>
+    <div class="subtopics-list"></div>
+    <div class="topic-footer">
+      <button class="btn-add-sub-topic">＋ 소주제 추가</button>
+    </div>`;
+
+  const subList = block.querySelector('.subtopics-list');
+  block.querySelector('.btn-del-topic').addEventListener('click', () => block.remove());
+  block.querySelector('.btn-add-sub-topic').addEventListener('click', () => addSubtopicBlock(subList, null));
+
+  (data?.subtopics || [{ id: 'sb-'+Date.now(), title:'', content:'' }]).forEach(sub =>
+    addSubtopicBlock(subList, sub)
+  );
+
+  list.appendChild(block);
+}
+
+/* 소주제 블록 */
+function addSubtopicBlock(container, data) {
+  const subId = data?.id || ('sb-' + Date.now() + Math.random().toString(36).slice(2,5));
+  const block = document.createElement('div');
+  block.className    = 'subtopic-block';
+  block.dataset.subId = subId;
+  block.innerHTML = `
+    <div class="subtopic-row1">
+      <span class="sub-label">소주제</span>
+      <input class="sub-title" placeholder="소주제 입력 (예: 바닥재 결정)" value="${esc(data?.title||'')}" />
+      <button class="btn-del-sub" title="삭제">×</button>
+    </div>
+    <textarea class="sub-content" placeholder="내용을 입력하세요">${esc(data?.content||'')}</textarea>`;
+  block.querySelector('.btn-del-sub').addEventListener('click', () => {
+    if (container.querySelectorAll('.subtopic-block').length === 1) {
+      alert('최소 1개의 소주제가 필요합니다.');
+      return;
+    }
+    block.remove();
+  });
+  container.appendChild(block);
+}
+
+/* 이미지 */
+function renderImageGrid() {
+  const grid = document.getElementById('image-grid');
+  if (!grid) return;
+  grid.innerHTML = formImages.map(img => `
+    <div class="image-thumb" data-id="${esc(img.id)}">
+      <img src="${img.dataUrl}" alt="첨부 이미지" />
+      <button class="btn-del-img" data-id="${esc(img.id)}">×</button>
+    </div>`).join('') + `
+    <label class="image-upload-label" for="image-input">
+      <span>＋</span><span>이미지 추가</span>
+    </label>`;
+
+  grid.querySelectorAll('.btn-del-img').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.id;
+      formImages = formImages.filter(img => img.id !== id);
+      renderImageGrid();
+    });
+  });
+}
+
+async function handleImageUpload(files) {
+  for (const file of Array.from(files)) {
+    if (file.size > 5 * 1024 * 1024) {
+      alert(`"${file.name}"은 5MB를 초과합니다. 더 작은 이미지를 사용해주세요.`);
+      continue;
+    }
+    const dataUrl = await resizeImage(file, 900);
+    formImages.push({ id: 'img-' + Date.now() + Math.random().toString(36).slice(2,5), dataUrl });
+    renderImageGrid();
+  }
+}
+
+function resizeImage(file, maxPx) {
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        if (w > maxPx) { h = Math.round(h * maxPx / w); w = maxPx; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.72));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+/* ════════════════════════════════════════
+   SAVE
+════════════════════════════════════════ */
+function collectTopics() {
+  const topics = [];
+  document.querySelectorAll('.topic-block').forEach(block => {
+    const subtopics = [];
+    block.querySelectorAll('.subtopic-block').forEach(sub => {
+      subtopics.push({
+        id:      sub.dataset.subId,
+        title:   sub.querySelector('.sub-title').value.trim(),
+        content: sub.querySelector('.sub-content').value.trim(),
+      });
+    });
+    topics.push({
+      id:        block.dataset.topicId,
+      category:  block.querySelector('.topic-cat').value,
+      subtopics,
+    });
+  });
+  return topics;
+}
+
+function collectAttendees() {
+  const others = [];
+  document.querySelectorAll('#attendee-others .attendee-row').forEach(row => {
+    const val = row.querySelector('input').value.trim();
+    if (val) others.push(val);
+  });
+  return {
+    client:   document.getElementById('f-client')?.value.trim() || '',
+    designer: document.getElementById('f-designer')?.value.trim() || '',
+    others,
+  };
+}
+
+function saveForm() {
+  const date      = document.getElementById('f-date').value;
+  const projectId = document.getElementById('f-project').value;
+  const method    = document.querySelector('.method-btn.selected')?.dataset.method || '방문';
+  const memo      = document.getElementById('f-memo').value.trim();
+
+  if (!date || !projectId) {
+    alert('날짜와 프로젝트는 필수입니다.');
+    return;
+  }
+
+  const updated = {
+    id:          editingId || ('mtg-' + Date.now()),
+    projectId,
+    date,
+    method,
+    attendees:   collectAttendees(),
+    topics:      collectTopics(),
+    images:      formImages.map(img => ({ id: img.id, dataUrl: img.dataUrl })),
+    memo,
+  };
+
+  const list = loadMeetings();
+  if (editingId) {
+    const idx = list.findIndex(x => x.id === editingId);
+    if (idx !== -1) list[idx] = updated;
+    else list.push(updated);
+  } else {
+    list.push(updated);
+  }
+
+  try {
+    saveMeetings(list);
+  } catch(e) {
+    alert('저장 공간이 부족합니다. 이미지를 줄여보세요.');
+    return;
+  }
+
+  projectFilter = projectId;
+  view = 'list';
+  renderList();
+}
+
+/* ════════════════════════════════════════
+   BOOT
+════════════════════════════════════════ */
+renderList();
+</script>
+</body>
+</html>

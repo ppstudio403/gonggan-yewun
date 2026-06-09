@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>공간여운 — 대시보드</title>
+  <script>
+    (function () {
+      if (!localStorage.getItem('ppstudio_user')) {
+        window.location.replace('login.html');
+      }
+    })();
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:            #f5f3f0;
+      --surface:       #ffffff;
+      --sidebar:       #1c1917;
+      --sidebar-hover: #292524;
+      --accent:        #b5945a;
+      --accent-light:  #d4b483;
+      --accent-pale:   #f5ead8;
+      --text:          #1c1917;
+      --text-sub:      #78716c;
+      --text-muted:    #a8a29e;
+      --border:        #e7e5e4;
+      --green:         #4ade80;
+      --green-bg:      #f0fdf4;
+      --blue:          #60a5fa;
+      --blue-bg:       #eff6ff;
+      --yellow:        #fbbf24;
+      --yellow-bg:     #fffbeb;
+      --shadow-sm:     0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+      --radius:        12px;
+      --radius-sm:     8px;
+    }
+
+    body {
+      font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* ══ HEADER ══ */
+    .header {
+      background: var(--sidebar);
+      height: 64px;
+      display: flex;
+      align-items: center;
+      padding: 0 28px;
+      gap: 16px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid #292524;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-logo {
+      width: 36px;
+      height: 36px;
+      background: var(--accent);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 800;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .header-brand-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -.3px;
+    }
+
+    .header-brand-name span { color: var(--accent-light); }
+
+    .header-sep { flex: 1; }
+
+    .header-date {
+      font-size: 13px;
+      color: #57534e;
+    }
+
+    .header-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-avatar {
+      width: 34px;
+      height: 34px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .header-user-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #e7e5e4;
+    }
+
+    .btn-logout {
+      padding: 7px 16px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: var(--radius-sm);
+      color: #a8a29e;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+
+    .btn-logout:hover {
+      background: rgba(255,255,255,.13);
+      color: #e7e5e4;
+    }
+
+    /* ══ LAYOUT ══ */
+    .layout {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+    }
+
+    /* ══ SIDEBAR ══ */
+    .sidebar {
+      width: 220px;
+      background: var(--sidebar);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      position: sticky;
+      top: 64px;
+      height: calc(100vh - 64px);
+      overflow-y: auto;
+      border-right: 1px solid #292524;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .nav-section-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: #57534e;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 12px 12px 6px;
+      margin-top: 4px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background .15s, color .15s;
+      color: #a8a29e;
+      font-size: 13.5px;
+      font-weight: 500;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      text-decoration: none;
+    }
+
+    .nav-item:hover { background: var(--sidebar-hover); color: #e7e5e4; }
+
+    .nav-item.active {
+      background: rgba(181,148,90,.15);
+      color: var(--accent-light);
+    }
+
+    .nav-icon { font-size: 16px; flex-shrink: 0; }
+
+    /* ══ MAIN ══ */
+    .main {
+      flex: 1;
+      min-width: 0;
+      overflow-y: auto;
+    }
+
+    .content {
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      max-width: 1060px;
+    }
+
+    /* PAGE HEADER */
+    .page-header { display: flex; flex-direction: column; gap: 4px; }
+
+    .page-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -.3px;
+    }
+
+    .page-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* NOTICE BANNER */
+    .notice-banner {
+      background: linear-gradient(135deg, #1c1917 60%, #2a1f10);
+      border-radius: var(--radius);
+      padding: 20px 28px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      color: #fff;
+      border: 1px solid #292524;
+    }
+
+    .notice-icon { font-size: 26px; }
+
+    .notice-text strong {
+      display: block;
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .notice-text span { font-size: 13px; color: #a8a29e; }
+
+    .notice-btn {
+      margin-left: auto;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 9px 18px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background .15s;
+    }
+
+    .notice-btn:hover { background: #a07d44; }
+
+    /* STAT CARDS */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .stat-card-head {
+      padding: 20px 22px 16px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stat-card-label {
+      font-size: 13px;
+      color: var(--text-sub);
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+
+    .stat-card-value {
+      font-size: 34px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -1.5px;
+      line-height: 1;
+    }
+
+    .stat-card-value small {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-sub);
+      letter-spacing: 0;
+      margin-left: 2px;
+    }
+
+    .stat-card-value .amount {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0;
+      margin-top: 6px;
+    }
+
+    .stat-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .stat-badge.green  { background: var(--green-bg); }
+    .stat-badge.blue   { background: var(--blue-bg); }
+    .stat-badge.yellow { background: var(--yellow-bg); }
+
+    .stat-card-body { padding: 16px 22px; }
+
+    /* sub rows */
+    .sub-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .sub-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .sub-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-sub);
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .dot.blue   { background: var(--blue); }
+    .dot.green  { background: var(--green); }
+    .dot.yellow { background: var(--yellow); }
+    .dot.accent { background: var(--accent); }
+
+    .sub-val {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    /* progress */
+    .goal-block { display: flex; flex-direction: column; gap: 6px; }
+
+    .goal-top {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .goal-top strong { color: var(--text-sub); font-weight: 600; }
+
+    .progress-bar {
+      height: 7px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 99px;
+      transition: width .6s ease;
+    }
+
+    /* schedule in card */
+    .sched-list { display: flex; flex-direction: column; }
+
+    .sched-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sched-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+    .sched-time {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--accent);
+      min-width: 44px;
+      padding-top: 2px;
+    }
+
+    .sched-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-top: 4px;
+      flex-shrink: 0;
+    }
+
+    .sched-dot.blue   { background: var(--blue); }
+    .sched-dot.yellow { background: var(--yellow); }
+    .sched-dot.green  { background: var(--green); }
+
+    .sched-info strong {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .sched-info span { font-size: 11.5px; color: var(--text-muted); }
+
+    /* ══ RESPONSIVE ══ */
+    @media (max-width: 960px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 700px) {
+      .sidebar { display: none; }
+      .content { padding: 20px; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .notice-btn { display: none; }
+      .header-date { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ HEADER ══ -->
+  <header class="header">
+    <div class="header-brand">
+      <div class="header-logo">GY</div>
+      <div class="header-brand-name">공간<span>여운</span></div>
+    </div>
+    <div class="header-sep"></div>
+    <div class="header-date" id="header-date"></div>
+    <div class="header-user">
+      <div class="header-avatar" id="user-avatar">관</div>
+      <div class="header-user-name" id="user-name">관리자</div>
+      <button class="btn-logout" id="logout-btn">로그아웃</button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- ══ SIDEBAR ══ -->
+    <aside class="sidebar">
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">업무</div>
+        <button class="nav-item active">
+          <span class="nav-icon">🏠</span> 대시보드
+        </button>
+        <a class="nav-item" href="projects.html">
+          <span class="nav-icon">🏗️</span> 프로젝트 관리
+        </a>
+        <a class="nav-item" href="consultation.html">
+          <span class="nav-icon">📝</span> 회의록
+        </a>
+        <a class="nav-item" href="orders.html">
+          <span class="nav-icon">📦</span> 발주서
+        </a>
+        <button class="nav-item">
+          <span class="nav-icon">🗓️</span> 일정
+        </button>
+        <div class="nav-section-label">시스템</div>
+        <button class="nav-item">
+          <span class="nav-icon">⚙️</span> 설정
+        </button>
+      </nav>
+    </aside>
+
+    <!-- ══ MAIN ══ -->
+    <main class="main">
+      <div class="content">
+
+        <!-- PAGE HEADER -->
+        <div class="page-header">
+          <div class="page-title">홈 대시보드</div>
+          <div class="page-sub" id="page-sub"></div>
+        </div>
+
+        <!-- NOTICE BANNER -->
+        <div class="notice-banner">
+          <div class="notice-icon">🏆</div>
+          <div class="notice-text">
+            <strong>이번 달 목표 달성률 70% — 순항 중!</strong>
+            <span>6월 목표 매출까지 1,800만원 남았습니다. 이번 주 착공 2건 예정.</span>
+          </div>
+          <button class="notice-btn">실적 보기</button>
+        </div>
+
+        <!-- STAT CARDS -->
+        <div class="stats-grid">
+
+          <!-- Card 1: 진행중인 현장 -->
+          <div class="stat-card">
+            <div class="stat-card-head">
+              <div>
+                <div class="stat-card-label">진행 중인 현장</div>
+                <div class="stat-card-value">8 <small>건</small></div>
+              </div>
+              <div class="stat-badge green">🏗️</div>
+            </div>
+            <div class="stat-card-body">
+              <div class="sub-list">
+                <div class="sub-row">
+                  <div class="sub-label"><div class="dot blue"></div> 시공 중</div>
+                  <div class="sub-val">5건</div>
+                </div>
+                <div class="sub-row">
+                  <div class="sub-label"><div class="dot yellow"></div> 착공 준비</div>
+                  <div class="sub-val">2건</div>
+                </div>
+                <div class="sub-row">
+                  <div class="sub-label"><div class="dot green"></div> 준공 대기</div>
+                  <div class="sub-val">1건</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: 이번달 계약 -->
+          <div class="stat-card">
+            <div class="stat-card-head">
+              <div>
+                <div class="stat-card-label">이번 달 계약</div>
+                <div class="stat-card-value">
+                  3 <small>건</small>
+                  <span class="amount">총 4,200만원</span>
+                </div>
+              </div>
+              <div class="stat-badge blue">📋</div>
+            </div>
+            <div class="stat-card-body">
+              <div class="goal-block">
+                <div class="goal-top">
+                  월 목표 달성률 <strong>70%</strong>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width:70%"></div>
+                </div>
+              </div>
+              <div class="sub-list" style="margin-top:14px;">
+                <div class="sub-row">
+                  <div class="sub-label"><div class="dot accent"></div> 강남 카페 인테리어</div>
+                  <div class="sub-val">1,800만</div>
+                </div>
+                <div class="sub-row">
+                  <div class="sub-label"><div class="dot accent"></div> 마포 사무실 리모델링</div>
+                  <div class="sub-val">1,600만</div>
+                </div>
+                <div class="sub-row">
+                  <div class="sub-label"><div class="dot accent"></div> 서초 주거 풀패키지</div>
+                  <div class="sub-val">800만</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: 오늘 일정 -->
+          <div class="stat-card">
+            <div class="stat-card-head">
+              <div>
+                <div class="stat-card-label">오늘 일정</div>
+                <div class="stat-card-value">3 <small>건</small></div>
+              </div>
+              <div class="stat-badge yellow">🗓️</div>
+            </div>
+            <div class="stat-card-body">
+              <div class="sched-list">
+                <div class="sched-item">
+                  <div class="sched-time">09:30</div>
+                  <div class="sched-dot blue"></div>
+                  <div class="sched-info">
+                    <strong>강남 현장 점검</strong>
+                    <span>강남구 논현동 · 이대리</span>
+                  </div>
+                </div>
+                <div class="sched-item">
+                  <div class="sched-time">11:00</div>
+                  <div class="sched-dot"></div>
+                  <div class="sched-info">
+                    <strong>신규 고객 첫 상담</strong>
+                    <span>용산 주거 40평 · 홍길동 고객</span>
+                  </div>
+                </div>
+                <div class="sched-item">
+                  <div class="sched-time">14:00</div>
+                  <div class="sched-dot yellow"></div>
+                  <div class="sched-info">
+                    <strong>자재 발주 미팅</strong>
+                    <span>삼성 목재 담당자 방문</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /stats-grid -->
+
+      </div><!-- /content -->
+    </main>
+
+  </div><!-- /layout -->
+
+  <script>
+    const user = JSON.parse(localStorage.getItem('ppstudio_user') || 'null');
+    if (!user) {
+      window.location.replace('login.html');
+    } else {
+      document.getElementById('user-name').textContent    = user.name;
+      document.getElementById('user-avatar').textContent  = user.name.charAt(0);
+    }
+
+    // date
+    const now = new Date();
+    document.getElementById('header-date').textContent =
+      now.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' });
+    document.getElementById('page-sub').textContent =
+      now.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' }) + ' 기준';
+
+    // logout
+    document.getElementById('logout-btn').addEventListener('click', function () {
+      localStorage.removeItem('ppstudio_user');
+      window.location.href = 'login.html';
+    });
+
+    // nav highlight
+    document.querySelectorAll('.nav-item').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.nav-item').forEach(function (b) { b.classList.remove('active'); });
+        this.classList.add('active');
+      });
+    });
+  </script>
+
+</body>
+</html>

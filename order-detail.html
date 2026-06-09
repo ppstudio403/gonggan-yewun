@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>공간여운 — 발주서 상세</title>
+  <script>(function(){ if(!localStorage.getItem('ppstudio_user')) window.location.replace('login.html'); })();</script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{
+      --bg:#f5f3f0;--surface:#fff;--sidebar:#1c1917;--sidebar-hover:#292524;
+      --accent:#b5945a;--accent-light:#d4b483;--accent-pale:#f5ead8;
+      --text:#1c1917;--text-sub:#78716c;--text-muted:#a8a29e;--border:#e7e5e4;
+      --shadow-sm:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+      --shadow-lg:0 20px 60px rgba(0,0,0,.28);
+      --radius:12px;--radius-sm:8px;
+    }
+    body{font-family:'Pretendard','Apple SD Gothic Neo','Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+
+    /* HEADER */
+    .header{background:var(--sidebar);height:64px;display:flex;align-items:center;padding:0 28px;gap:16px;flex-shrink:0;position:sticky;top:0;z-index:100;border-bottom:1px solid #292524;}
+    .header-brand{display:flex;align-items:center;gap:12px;}
+    .header-logo{width:36px;height:36px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;}
+    .header-brand-name{font-size:18px;font-weight:700;color:#fff;letter-spacing:-.3px;}
+    .header-brand-name span{color:var(--accent-light);}
+    .header-sep{flex:1;}
+    .header-date{font-size:13px;color:#57534e;}
+    .header-user{display:flex;align-items:center;gap:10px;}
+    .header-avatar{width:34px;height:34px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;}
+    .header-user-name{font-size:14px;font-weight:600;color:#e7e5e4;}
+    .btn-logout{padding:7px 16px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:var(--radius-sm);color:#a8a29e;font-size:13px;font-weight:600;cursor:pointer;}
+    .btn-logout:hover{background:rgba(255,255,255,.13);color:#e7e5e4;}
+
+    /* LAYOUT */
+    .layout{display:flex;flex:1;min-height:0;}
+    .sidebar{width:220px;background:var(--sidebar);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:64px;height:calc(100vh - 64px);overflow-y:auto;border-right:1px solid #292524;}
+    .sidebar-nav{flex:1;padding:16px 10px;display:flex;flex-direction:column;gap:2px;}
+    .nav-section-label{font-size:10px;font-weight:600;color:#57534e;letter-spacing:1px;text-transform:uppercase;padding:12px 12px 6px;margin-top:4px;}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--radius-sm);cursor:pointer;color:#a8a29e;font-size:13.5px;font-weight:500;border:none;background:none;width:100%;text-align:left;text-decoration:none;transition:background .15s,color .15s;}
+    .nav-item:hover{background:var(--sidebar-hover);color:#e7e5e4;}
+    .nav-item.active{background:rgba(181,148,90,.15);color:var(--accent-light);}
+    .nav-icon{font-size:16px;flex-shrink:0;}
+    .main{flex:1;min-width:0;overflow-y:auto;}
+    .content{padding:32px;display:flex;flex-direction:column;gap:24px;max-width:900px;}
+
+    /* BREADCRUMB */
+    .breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-muted);}
+    .breadcrumb a{color:var(--accent);font-weight:600;text-decoration:none;}
+    .breadcrumb a:hover{opacity:.75;}
+
+    /* PAGE HEADER */
+    .page-header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+    .page-order-no{font-size:22px;font-weight:700;color:var(--text);letter-spacing:-.3px;}
+    .status-badge{display:inline-flex;align-items:center;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;}
+    .badge-wait{background:#fffbeb;color:#d97706;}
+    .badge-done{background:#f0fdf4;color:#16a34a;}
+    .ph-sep{flex:1;}
+    .ph-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+
+    /* BUTTONS */
+    .btn{padding:9px 18px;border:none;border-radius:var(--radius-sm);font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s;}
+    .btn-primary{background:var(--accent);color:#fff;}
+    .btn-primary:hover{background:#a07d44;}
+    .btn-outline{background:var(--surface);border:1.5px solid var(--border);color:var(--text-sub);}
+    .btn-outline:hover{border-color:var(--accent);color:var(--accent);}
+    .btn-danger{background:#fef2f2;border:1.5px solid #fecaca;color:#dc2626;}
+    .btn-danger:hover{background:#fee2e2;}
+    .btn-print{background:#f5f3f0;border:1.5px solid var(--border);color:var(--text-sub);}
+    .btn-print:hover{border-color:var(--accent);color:var(--accent);}
+    .btn-status-done{background:#f0fdf4;border:1.5px solid #bbf7d0;color:#16a34a;}
+    .btn-status-done:hover{background:#dcfce7;}
+    .btn-status-wait{background:#fffbeb;border:1.5px solid #fde68a;color:#d97706;}
+    .btn-status-wait:hover{background:#fef3c7;}
+    .btn-sm{padding:6px 14px;font-size:12.5px;}
+
+    /* CARD */
+    .card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:24px;}
+    .card-title{font-size:13px;font-weight:700;color:var(--text-sub);letter-spacing:.4px;text-transform:uppercase;margin-bottom:16px;padding-bottom:12px;border-bottom:1.5px solid var(--border);}
+
+    /* FORM */
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    .form-group{display:flex;flex-direction:column;gap:6px;}
+    .form-label{font-size:12px;font-weight:600;color:var(--text-muted);letter-spacing:.3px;}
+    .form-input{padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;color:var(--text);background:var(--surface);outline:none;font-family:inherit;transition:border-color .15s;width:100%;}
+    .form-input:focus{border-color:var(--accent);}
+    textarea.form-input{resize:vertical;min-height:80px;line-height:1.6;}
+    .form-select{padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;color:var(--text);background:var(--surface);outline:none;font-family:inherit;width:100%;transition:border-color .15s;}
+    .form-select:focus{border-color:var(--accent);}
+    .col-2{grid-column:1/-1;}
+
+    /* INPUT ROW WITH BUTTON */
+    .input-btn-row{display:flex;gap:8px;}
+    .input-btn-row .autocomplete-wrap,.input-btn-row input{flex:1;}
+    .btn-mgr{flex-shrink:0;padding:10px 14px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:12.5px;font-weight:700;color:var(--text-sub);cursor:pointer;font-family:inherit;white-space:nowrap;transition:border-color .15s,color .15s;}
+    .btn-mgr:hover{border-color:var(--accent);color:var(--accent);}
+
+    /* AUTOCOMPLETE */
+    .autocomplete-wrap{position:relative;flex:1;}
+    .autocomplete-dropdown{position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1.5px solid var(--accent);border-top:none;border-radius:0 0 var(--radius-sm) var(--radius-sm);max-height:160px;overflow-y:auto;z-index:50;display:none;box-shadow:var(--shadow-sm);}
+    .autocomplete-item{padding:10px 14px;font-size:13.5px;cursor:pointer;transition:background .1s;}
+    .autocomplete-item:hover{background:var(--accent-pale);}
+
+    /* ITEMS CARD */
+    .items-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+    .items-card-head{padding:16px 20px 0;}
+    .items-card-title{font-size:13px;font-weight:700;color:var(--text-sub);letter-spacing:.4px;text-transform:uppercase;margin-bottom:12px;}
+    .cat-tabs-row{display:flex;align-items:stretch;border-bottom:2px solid var(--border);padding:0 20px;}
+    .cat-tabs{display:flex;flex:1;overflow-x:auto;}
+    .cat-tab{padding:10px 14px;border:none;background:none;font-size:13.5px;font-weight:600;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;font-family:inherit;transition:color .15s,border-color .15s;}
+    .cat-tab:hover{color:var(--text);}
+    .cat-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+    .cat-count-badge{display:inline-block;background:var(--border);color:var(--text-sub);font-size:10.5px;font-weight:700;padding:1px 5px;border-radius:10px;margin-left:4px;}
+    .cat-tab.active .cat-count-badge{background:var(--accent-pale);color:var(--accent);}
+    .btn-bulk{flex-shrink:0;padding:7px 12px;background:none;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-weight:700;color:var(--text-muted);cursor:pointer;font-family:inherit;margin:6px 0 6px 10px;transition:border-color .15s,color .15s;}
+    .btn-bulk:hover{border-color:var(--accent);color:var(--accent);}
+    .items-table-wrap{overflow-x:auto;}
+    .items-head{display:grid;grid-template-columns:40px 1fr 90px 1.6fr 36px;padding:9px 20px;background:#faf9f8;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.5px;text-transform:uppercase;min-width:480px;}
+    .items-body{min-width:480px;}
+    .item-row{display:grid;grid-template-columns:40px 1fr 90px 1.6fr 36px;padding:6px 20px;border-bottom:1px solid var(--border);align-items:center;}
+    .item-row:last-child{border-bottom:none;}
+    .item-num{font-size:12px;color:var(--text-muted);font-weight:700;text-align:center;}
+    .item-input{padding:7px 10px;border:1.5px solid transparent;border-radius:6px;font-size:13.5px;color:var(--text);background:transparent;outline:none;font-family:inherit;width:100%;transition:border-color .15s,background .15s;}
+    .item-input:focus{border-color:var(--accent);background:var(--surface);}
+    .item-qty{text-align:center;}
+    .btn-del-row{width:28px;height:28px;border:1.5px solid var(--border);background:var(--surface);border-radius:6px;color:var(--text-muted);font-size:15px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit;transition:all .15s;}
+    .btn-del-row:hover{border-color:#dc2626;color:#dc2626;background:#fef2f2;}
+    .items-footer{padding:12px 20px;border-top:1.5px dashed var(--border);}
+    .btn-add-row{display:flex;align-items:center;gap:6px;padding:7px 16px;background:var(--accent-pale);border:1.5px solid var(--accent-light);border-radius:var(--radius-sm);color:var(--accent);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s;}
+    .btn-add-row:hover{background:#eeddbe;}
+    .items-empty{padding:36px;text-align:center;color:var(--text-muted);font-size:13.5px;}
+
+    /* CATEGORY BADGE */
+    .cat-badge{display:inline-flex;padding:2px 9px;border-radius:12px;font-size:11.5px;font-weight:700;}
+
+    /* MODAL */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:300;padding:20px;}
+    .modal-overlay.open{display:flex;}
+    .modal-box{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow-lg);display:flex;flex-direction:column;max-height:88vh;width:100%;}
+    .modal-hd{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+    .modal-hd h3{font-size:17px;font-weight:700;}
+    .btn-close-modal{width:32px;height:32px;border:none;background:none;font-size:22px;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:6px;transition:background .15s;}
+    .btn-close-modal:hover{background:var(--bg);}
+    .modal-tabs{display:flex;border-bottom:2px solid var(--border);flex-shrink:0;padding:0 24px;}
+    .modal-tab{padding:12px 18px;border:none;background:none;font-size:13.5px;font-weight:600;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:inherit;transition:color .15s,border-color .15s;}
+    .modal-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+    .modal-body{overflow-y:auto;flex:1;padding:20px 24px;}
+
+    /* VENDOR SELECT TAB */
+    .cat-filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+    .cat-filter-btn{padding:6px 14px;border:1.5px solid var(--border);border-radius:20px;background:var(--surface);font-size:12.5px;font-weight:600;color:var(--text-muted);cursor:pointer;font-family:inherit;transition:all .15s;}
+    .cat-filter-btn.active{background:var(--accent-pale);border-color:var(--accent);color:var(--accent);}
+    .vendor-cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .vendor-select-card{padding:14px 16px;border:1.5px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:border-color .15s,background .15s;display:flex;flex-direction:column;gap:5px;}
+    .vendor-select-card:hover{border-color:var(--accent);background:var(--accent-pale);}
+    .vsc-name{font-size:15px;font-weight:700;}
+    .vsc-info{font-size:12.5px;color:var(--text-muted);}
+
+    /* VENDOR/MANAGER MANAGE */
+    .vendor-form-box{background:#faf9f8;border:1px solid var(--border);border-radius:var(--radius-sm);padding:18px;margin-bottom:20px;}
+    .vendor-form-title{font-size:12px;font-weight:700;color:var(--text-sub);letter-spacing:.4px;text-transform:uppercase;margin-bottom:14px;}
+    .vf-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .vf-full{grid-column:1/-1;}
+    .vfg-label{font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:5px;}
+    .vendor-form-actions{display:flex;gap:8px;margin-top:14px;}
+    .vendor-list-section-title{font-size:12px;font-weight:700;color:var(--text-sub);letter-spacing:.4px;text-transform:uppercase;margin-bottom:10px;}
+    .vendor-list{display:flex;flex-direction:column;gap:8px;}
+    .vendor-list-item{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);}
+    .vendor-list-item.selectable{cursor:pointer;transition:border-color .15s,background .15s;}
+    .vendor-list-item.selectable:hover{border-color:var(--accent);background:var(--accent-pale);}
+    .vli-info{flex:1;min-width:0;}
+    .vli-name{font-size:14px;font-weight:700;}
+    .vli-meta{font-size:12px;color:var(--text-muted);margin-top:2px;}
+    .vli-actions{display:flex;gap:6px;flex-shrink:0;}
+    .btn-vli{padding:5px 12px;border:1.5px solid var(--border);border-radius:6px;background:var(--surface);font-size:12px;font-weight:700;color:var(--text-sub);cursor:pointer;font-family:inherit;transition:all .15s;}
+    .btn-vli:hover{border-color:var(--accent);color:var(--accent);}
+    .btn-vli.del:hover{border-color:#dc2626;color:#dc2626;background:#fef2f2;}
+    .modal-empty{padding:30px;text-align:center;color:var(--text-muted);font-size:13px;}
+
+    /* BULK */
+    .bulk-hint{font-size:13px;color:var(--text-sub);margin-bottom:12px;line-height:1.6;}
+    .bulk-example{background:#faf9f8;border:1px solid var(--border);border-radius:6px;padding:10px 14px;font-size:12.5px;color:var(--text-muted);font-family:monospace;margin-bottom:16px;line-height:1.8;}
+    .bulk-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;}
+
+    /* PRINT AREA (hidden; shown @media print) */
+    #print-area{display:none;font-family:'Apple SD Gothic Neo','Noto Sans KR',sans-serif;background:#fff;}
+    .p-wrap{max-width:210mm;margin:0 auto;padding:18mm 15mm;}
+    .p-top{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px;border-bottom:2.5px solid #1c1917;padding-bottom:16px;}
+    .p-brand{display:flex;align-items:center;gap:10px;}
+    .p-logo{width:38px;height:38px;background:#b5945a;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;}
+    .p-brand-name{font-size:19px;font-weight:700;color:#1c1917;}
+    .p-title-block{text-align:right;}
+    .p-title{font-size:26px;font-weight:800;color:#1c1917;}
+    .p-order-no{font-size:13px;color:#78716c;margin-top:4px;}
+    .p-info{width:100%;border-collapse:collapse;margin-bottom:24px;font-size:13px;}
+    .p-info th,.p-info td{padding:8px 12px;border:1px solid #e7e5e4;}
+    .p-info th{background:#faf9f8;font-weight:700;color:#78716c;width:120px;white-space:nowrap;}
+    .p-info td{color:#1c1917;}
+    .p-section-label{font-size:13.5px;font-weight:700;color:#1c1917;margin:20px 0 10px;padding:8px 12px;background:#faf9f8;border-left:3.5px solid #b5945a;}
+    .p-cat-label{font-size:12.5px;font-weight:700;color:#78716c;margin:12px 0 5px;}
+    .p-items{width:100%;border-collapse:collapse;margin-bottom:14px;font-size:13px;}
+    .p-items th,.p-items td{padding:7px 10px;border:1px solid #e7e5e4;}
+    .p-items th{background:#faf9f8;font-weight:700;color:#78716c;}
+    .p-memo{margin-top:20px;padding:12px 16px;background:#faf9f8;border:1px solid #e7e5e4;border-radius:6px;font-size:13px;color:#1c1917;line-height:1.6;}
+    .p-sign{margin-top:48px;display:flex;justify-content:flex-end;}
+    .p-sign-table{border-collapse:collapse;font-size:13px;}
+    .p-sign-table th,.p-sign-table td{padding:10px 20px;border:1px solid #e7e5e4;}
+    .p-sign-table th{background:#faf9f8;font-weight:700;color:#78716c;}
+    .p-sign-table td{min-width:150px;}
+
+    @media print{
+      .header,.layout,.modal-overlay,#toast{display:none!important;}
+      #print-area{display:block!important;}
+      *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+      .p-items,.p-sign{page-break-inside:avoid;}
+    }
+    @media(max-width:700px){
+      .sidebar{display:none;}.content{padding:16px;gap:16px;}
+      .form-grid,.vf-grid{grid-template-columns:1fr;}
+      .vendor-cards-grid{grid-template-columns:1fr;}
+      .ph-actions{flex-wrap:wrap;}
+      .modal-box{max-width:100%;}
+    }
+  </style>
+</head>
+<body>
+<header class="header">
+  <div class="header-brand">
+    <div class="header-logo">GY</div>
+    <div class="header-brand-name">공간<span>여운</span></div>
+  </div>
+  <div class="header-sep"></div>
+  <div class="header-date" id="header-date"></div>
+  <div class="header-user">
+    <div class="header-avatar" id="user-avatar">관</div>
+    <div class="header-user-name" id="user-name">관리자</div>
+    <button class="btn-logout" id="logout-btn">로그아웃</button>
+  </div>
+</header>
+<div class="layout">
+  <aside class="sidebar">
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">업무</div>
+      <a class="nav-item" href="dashboard.html"><span class="nav-icon">🏠</span> 대시보드</a>
+      <a class="nav-item" href="projects.html"><span class="nav-icon">🏗️</span> 프로젝트 관리</a>
+      <a class="nav-item" href="consultation.html"><span class="nav-icon">📝</span> 회의록</a>
+      <a class="nav-item active" href="orders.html"><span class="nav-icon">📦</span> 발주서</a>
+      <button class="nav-item"><span class="nav-icon">🗓️</span> 일정</button>
+      <div class="nav-section-label">시스템</div>
+      <button class="nav-item"><span class="nav-icon">⚙️</span> 설정</button>
+    </nav>
+  </aside>
+  <main class="main">
+    <div class="content" id="content">
+      <div style="padding:60px;text-align:center;color:var(--text-muted);">불러오는 중...</div>
+    </div>
+  </main>
+</div>
+
+<!-- ═══ VENDOR MODAL ═══ -->
+<div class="modal-overlay" id="vendor-modal">
+  <div class="modal-box" style="max-width:660px;">
+    <div class="modal-hd">
+      <h3>업체 관리</h3>
+      <button class="btn-close-modal" id="close-vendor-modal">×</button>
+    </div>
+    <div class="modal-tabs" id="vendor-modal-tabs">
+      <button class="modal-tab active" data-vtab="select">업체 선택</button>
+      <button class="modal-tab" data-vtab="manage">업체 등록/관리</button>
+    </div>
+    <div class="modal-body" id="vendor-modal-body"></div>
+  </div>
+</div>
+
+<!-- ═══ MANAGER MODAL ═══ -->
+<div class="modal-overlay" id="manager-modal">
+  <div class="modal-box" style="max-width:500px;">
+    <div class="modal-hd">
+      <h3>현장 담당자 관리</h3>
+      <button class="btn-close-modal" id="close-manager-modal">×</button>
+    </div>
+    <div class="modal-body" id="manager-modal-body"></div>
+  </div>
+</div>
+
+<!-- ═══ BULK MODAL ═══ -->
+<div class="modal-overlay" id="bulk-modal">
+  <div class="modal-box" style="max-width:460px;">
+    <div class="modal-hd">
+      <h3>일괄입력</h3>
+      <button class="btn-close-modal" id="close-bulk-modal">×</button>
+    </div>
+    <div class="modal-body">
+      <p class="bulk-hint">한 줄에 품목 하나씩 입력하세요.<br>탭(Tab)으로 구분하면 수량과 비고도 입력 가능합니다.</p>
+      <div class="bulk-example">각재<br>합판	20<br>석고보드	15	2.5T 사양</div>
+      <textarea class="form-input" id="bulk-textarea" rows="9" placeholder="여기에 붙여넣기 또는 입력..."></textarea>
+      <div class="bulk-footer">
+        <button class="btn btn-outline btn-sm" id="cancel-bulk">취소</button>
+        <button class="btn btn-primary btn-sm" id="apply-bulk">추가</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PRINT AREA ═══ -->
+<div id="print-area"></div>
+
+<script>
+/* ── AUTH ── */
+const _user=JSON.parse(localStorage.getItem('ppstudio_user')||'null');
+if(!_user)window.location.replace('login.html');
+document.getElementById('user-name').textContent=_user.name;
+document.getElementById('user-avatar').textContent=_user.name.charAt(0);
+document.getElementById('header-date').textContent=
+  new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'short'});
+document.getElementById('logout-btn').addEventListener('click',()=>{
+  localStorage.removeItem('ppstudio_user');window.location.href='login.html';
+});
+
+/* ── CONSTANTS ── */
+const ITEM_CATS=['목자재','타일자재','조명&전기기구','페인트','도배'];
+const VENDOR_CATS=['목자재','타일자재','조명&전기기구','페인트','도배','기타'];
+const MANAGER_ROLES=['디자이너','현장소장','기타'];
+
+const CAT_STYLE={
+  '목자재':        'background:#fef3c7;color:#b45309;',
+  '타일자재':      'background:#eff6ff;color:#2563eb;',
+  '조명&전기기구': 'background:#fffbeb;color:#d97706;',
+  '페인트':        'background:#fff7ed;color:#c2410c;',
+  '도배':          'background:#f0fdf4;color:#15803d;',
+  '기타':          'background:#f4f4f5;color:#71717a;',
+};
+
+/* ── DATA ── */
+const INIT_ORDERS=[
+  {id:'PO-2026-001',projectId:'proj-001',vendor:'삼성목재',vendorContact:'김대리',vendorPhone:'010-1234-5678',siteManager:'',siteAddress:'',orderDate:'2026-01-20',deliveryDate:'2026-02-05',status:'납품완료',
+   categories:{'목자재':[{id:'i001',name:'각재',qty:50,note:''},{id:'i002',name:'합판',qty:20,note:'18T'}],'타일자재':[],'조명&전기기구':[],'페인트':[],'도배':[]},
+   memo:'현장 반입 시 1층 주차장 사용 가능',createdAt:'2026-01-20'},
+  {id:'PO-2026-002',projectId:'proj-001',vendor:'타일왕',vendorContact:'박사장',vendorPhone:'010-9876-5432',siteManager:'',siteAddress:'',orderDate:'2026-03-15',deliveryDate:'2026-04-01',status:'대기중',
+   categories:{'목자재':[],'타일자재':[{id:'i003',name:'바닥타일',qty:120,note:'600×600 헤링본'},{id:'i004',name:'줄눈재',qty:5,note:'2kg'}],'조명&전기기구':[],'페인트':[],'도배':[]},
+   memo:'',createdAt:'2026-03-15'},
+  {id:'PO-2026-003',projectId:'proj-002',vendor:'한빛조명',vendorContact:'이부장',vendorPhone:'010-5555-1234',siteManager:'',siteAddress:'',orderDate:'2026-02-20',deliveryDate:'2026-03-05',status:'대기중',
+   categories:{'목자재':[],'타일자재':[],'조명&전기기구':[{id:'i005',name:'메인조명',qty:12,note:'LED 60W 주광색'},{id:'i006',name:'간접조명',qty:8,note:'LED 스트립 5m'}],'페인트':[],'도배':[]},
+   memo:'설치 서비스 포함',createdAt:'2026-02-20'},
+];
+const INIT_VENDORS=[
+  {id:'v001',name:'삼성목재',category:'목자재',contact:'김대리',phone:'010-1234-5678',bizNo:'',memo:'주차 가능'},
+  {id:'v002',name:'타일왕',category:'타일자재',contact:'박사장',phone:'010-9876-5432',bizNo:'',memo:''},
+  {id:'v003',name:'한빛조명',category:'조명&전기기구',contact:'이부장',phone:'010-5555-1234',bizNo:'',memo:'설치 서비스 포함'},
+  {id:'v004',name:'대한페인트',category:'페인트',contact:'',phone:'',bizNo:'',memo:''},
+  {id:'v005',name:'현대도배',category:'도배',contact:'',phone:'',bizNo:'',memo:''},
+];
+const INIT_MANAGERS=[
+  {id:'mgr001',name:'김인테리어',phone:'010-1111-2222',role:'디자이너'},
+  {id:'mgr002',name:'이현장',phone:'010-3333-4444',role:'현장소장'},
+];
+
+function loadOrders(){const r=localStorage.getItem('ppstudio_orders');if(!r){saveOrders(INIT_ORDERS);return JSON.parse(JSON.stringify(INIT_ORDERS));}return JSON.parse(r);}
+function saveOrders(l){localStorage.setItem('ppstudio_orders',JSON.stringify(l));}
+function loadProjects(){return JSON.parse(localStorage.getItem('ppstudio_projects')||'[]');}
+function loadVendors(){const r=localStorage.getItem('ppstudio_vendors2');if(!r){saveVendors(INIT_VENDORS);return JSON.parse(JSON.stringify(INIT_VENDORS));}return JSON.parse(r);}
+function saveVendors(l){localStorage.setItem('ppstudio_vendors2',JSON.stringify(l));}
+function loadManagers(){const r=localStorage.getItem('ppstudio_managers');if(!r){saveManagers(INIT_MANAGERS);return JSON.parse(JSON.stringify(INIT_MANAGERS));}return JSON.parse(r);}
+function saveManagers(l){localStorage.setItem('ppstudio_managers',JSON.stringify(l));}
+
+function todayStr(){return new Date().toISOString().slice(0,10);}
+function newId(p){return p+Date.now()+Math.random().toString(36).slice(2,5);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function fmtDate(iso){if(!iso)return'-';const[y,m,d]=iso.split('-');return`${y}.${m}.${d}`;}
+
+function generateOrderNo(){
+  const yr=new Date().getFullYear();
+  const same=loadOrders().filter(o=>o.id.startsWith('PO-'+yr+'-'));
+  return 'PO-'+yr+'-'+String(same.length+1).padStart(3,'0');
+}
+function catBadge(cat){const st=CAT_STYLE[cat]||CAT_STYLE['기타'];return`<span class="cat-badge" style="${st}">${esc(cat)}</span>`;}
+
+/* ── URL / STATE ── */
+const params=new URLSearchParams(location.search);
+const editId  =params.get('id');
+const isNew   =params.get('new')==='true';
+const initProj=params.get('project')||'';
+
+let orderData=null;
+let currentCat=ITEM_CATS[0];
+let selectedVendorCat='';  // '' = all tabs
+let activeVTab='select';
+let vendorCatFilter='';
+let editingVendorId=null;
+let editingManagerId=null;
+
+/* ── ORDER INIT ── */
+function initOrderData(){
+  if(isNew){
+    orderData={id:generateOrderNo(),projectId:initProj,vendor:'',vendorContact:'',vendorPhone:'',siteAddress:'',siteManager:'',
+      orderDate:todayStr(),deliveryDate:'',status:'대기중',
+      categories:Object.fromEntries(ITEM_CATS.map(c=>[c,[]])),memo:'',createdAt:todayStr()};
+    // auto-fill address for pre-set project
+    if(initProj){
+      const proj=loadProjects().find(p=>p.id===initProj);
+      if(proj&&proj.address)orderData.siteAddress=proj.address;
+    }
+  } else if(editId){
+    const orders=loadOrders();
+    const found=orders.find(o=>o.id===editId);
+    if(!found){alert('발주서를 찾을 수 없습니다.');window.location.href='orders.html';return;}
+    orderData=JSON.parse(JSON.stringify(found));
+    // migrate old "contact" field
+    if(!orderData.vendorContact&&orderData.contact)orderData.vendorContact=orderData.contact;
+    if(!orderData.vendorPhone)orderData.vendorPhone='';
+    if(!orderData.siteAddress)orderData.siteAddress='';
+    if(!orderData.siteManager)orderData.siteManager='';
+    ITEM_CATS.forEach(c=>{if(!orderData.categories[c])orderData.categories[c]=[];});
+  } else {
+    window.location.href='orders.html';
+  }
+}
+
+function initSelectedVendorCat(){
+  if(!orderData||!orderData.vendor)return;
+  const v=loadVendors().find(v=>v.name===orderData.vendor);
+  if(v&&ITEM_CATS.includes(v.category))selectedVendorCat=v.category;
+}
+
+/* ── ACTIVE TABS ── */
+function getActiveTabs(){
+  if(selectedVendorCat&&ITEM_CATS.includes(selectedVendorCat))return[selectedVendorCat];
+  return ITEM_CATS;
+}
+
+function renderCatTabs(){
+  const tabs=getActiveTabs();
+  if(!tabs.includes(currentCat)){
+    saveCurrentCat();
+    currentCat=tabs[0];
+    renderItemsBody(currentCat);
+  }
+  const container=document.getElementById('cat-tabs');
+  if(!container)return;
+  container.innerHTML=tabs.map(c=>
+    `<button class="cat-tab${c===currentCat?' active':''}" data-cat="${esc(c)}">${esc(c)} <span class="cat-count-badge"></span></button>`
+  ).join('');
+  container.querySelectorAll('.cat-tab').forEach(btn=>{
+    btn.addEventListener('click',function(){switchCat(this.dataset.cat);});
+  });
+  updateTabCounts();
+}
+
+/* ── ITEMS ── */
+function collectCurrentItems(){
+  return Array.from(document.querySelectorAll('#items-body .item-row')).map(r=>({
+    id:r.dataset.id,
+    name:r.querySelector('.item-name').value.trim(),
+    qty:r.querySelector('.item-qty').value.trim(),
+    note:r.querySelector('.item-note').value.trim(),
+  })).filter(i=>i.name||i.qty||i.note);
+}
+
+function saveCurrentCat(){orderData.categories[currentCat]=collectCurrentItems();}
+
+function renderItemsBody(cat){
+  const body=document.getElementById('items-body');
+  if(!body)return;
+  body.innerHTML='';
+  const items=orderData.categories[cat]||[];
+  if(items.length===0){body.innerHTML='<div class="items-empty">품목이 없습니다. 아래 버튼으로 추가하세요.</div>';return;}
+  items.forEach((it,idx)=>body.appendChild(createItemRow(it,idx)));
+}
+
+function createItemRow(data,idx){
+  const row=document.createElement('div');
+  row.className='item-row';row.dataset.id=data.id||newId('i');
+  row.innerHTML=`
+    <div class="item-num">${(idx??0)+1}</div>
+    <input class="item-input item-name" placeholder="품목명" value="${esc(data.name||'')}"/>
+    <input class="item-input item-qty qty" type="number" min="0" step="any" placeholder="수량" value="${esc(data.qty||'')}"/>
+    <input class="item-input item-note" placeholder="비고" value="${esc(data.note||'')}"/>
+    <button class="btn-del-row">×</button>`;
+  row.querySelector('.btn-del-row').addEventListener('click',()=>{row.remove();reindexRows();updateTabCounts();});
+  return row;
+}
+
+function reindexRows(){
+  document.querySelectorAll('#items-body .item-row').forEach((r,i)=>r.querySelector('.item-num').textContent=i+1);
+}
+
+function addItemRow(data){
+  const body=document.getElementById('items-body');if(!body)return;
+  const empty=body.querySelector('.items-empty');if(empty)body.innerHTML='';
+  const idx=body.querySelectorAll('.item-row').length;
+  body.appendChild(createItemRow(data||{id:newId('i')},idx));
+  updateTabCounts();
+}
+
+function switchCat(newCat){
+  saveCurrentCat();currentCat=newCat;renderItemsBody(newCat);
+  document.querySelectorAll('.cat-tab').forEach(b=>b.classList.toggle('active',b.dataset.cat===newCat));
+  updateTabCounts();
+}
+
+function updateTabCounts(){
+  const snap=Object.assign({},orderData.categories,{[currentCat]:collectCurrentItems()});
+  document.querySelectorAll('.cat-tab').forEach(btn=>{
+    const c=btn.dataset.cat;
+    const cnt=(snap[c]||[]).filter(i=>i.name||i.qty).length;
+    const badge=btn.querySelector('.cat-count-badge');
+    if(badge)badge.textContent=cnt||'';
+  });
+}
+
+/* ── GATHER / SAVE / DELETE ── */
+function gatherOrder(){
+  saveCurrentCat();
+  return{
+    id:orderData.id,
+    projectId:   document.getElementById('f-project').value,
+    vendor:      document.getElementById('f-vendor').value.trim(),
+    vendorContact:document.getElementById('f-vendor-contact').value.trim(),
+    vendorPhone: document.getElementById('f-vendor-phone').value.trim(),
+    siteAddress: document.getElementById('f-site-address').value.trim(),
+    siteManager: document.getElementById('f-site-manager').value.trim(),
+    orderDate:   document.getElementById('f-order-date').value,
+    deliveryDate:document.getElementById('f-delivery-date').value,
+    status:      orderData.status,
+    categories:  JSON.parse(JSON.stringify(orderData.categories)),
+    memo:        document.getElementById('f-memo').value.trim(),
+    createdAt:   orderData.createdAt,
+  };
+}
+
+function doSave(redirect){
+  const updated=gatherOrder();
+  if(!updated.vendor){alert('업체명을 입력하세요.');return false;}
+  if(!updated.orderDate){alert('발주일을 입력하세요.');return false;}
+  const orders=loadOrders();
+  const idx=orders.findIndex(o=>o.id===updated.id);
+  if(idx>=0)orders[idx]=updated;else orders.push(updated);
+  saveOrders(orders);
+  orderData=JSON.parse(JSON.stringify(updated));
+  if(redirect){
+    const q=updated.projectId?'?project='+updated.projectId:'';
+    window.location.href='orders.html'+q;
+  }else showToast('저장되었습니다.');
+  return true;
+}
+
+function doToggleStatus(){
+  const ns=orderData.status==='대기중'?'납품완료':'대기중';
+  if(!confirm(`발주서 상태를 "${ns}"(으)로 변경하시겠습니까?`))return;
+  orderData.status=ns;
+  if(!doSave(false))return;
+  renderPage();
+}
+
+function doDelete(){
+  if(!confirm(`발주서 ${orderData.id}를 삭제하시겠습니까?\n삭제된 데이터는 복구할 수 없습니다.`))return;
+  saveOrders(loadOrders().filter(o=>o.id!==orderData.id));
+  const q=orderData.projectId?'?project='+orderData.projectId:'';
+  window.location.href='orders.html'+q;
+}
+
+function showToast(msg){
+  let t=document.getElementById('toast');
+  if(!t){t=document.createElement('div');t.id='toast';
+    t.style.cssText='position:fixed;bottom:28px;right:28px;background:#1c1917;color:#e7e5e4;padding:12px 20px;border-radius:8px;font-size:14px;font-weight:600;z-index:999;opacity:0;transition:opacity .3s;';
+    document.body.appendChild(t);}
+  t.textContent=msg;t.style.opacity='1';
+  clearTimeout(t._tid);t._tid=setTimeout(()=>t.style.opacity='0',2000);
+}
+
+/* ── AUTOCOMPLETE ── */
+function initAutocomplete(){
+  const inp=document.getElementById('f-vendor');
+  const dd=document.getElementById('vendor-dropdown');
+  if(!inp||!dd)return;
+  function showSugg(val){
+    const vendors=loadVendors();
+    const q=val.trim().toLowerCase();
+    const matches=q?vendors.filter(v=>v.name.toLowerCase().includes(q)):vendors;
+    if(!matches.length){dd.style.display='none';return;}
+    dd.innerHTML=matches.map(v=>`<div class="autocomplete-item" data-vid="${esc(v.id)}">${esc(v.name)}</div>`).join('');
+    dd.querySelectorAll('.autocomplete-item').forEach(item=>{
+      item.addEventListener('mousedown',e=>{
+        e.preventDefault();
+        const v=loadVendors().find(v=>v.id===item.dataset.vid);
+        if(v)applyVendorSelection(v);
+        dd.style.display='none';
+      });
+    });
+    dd.style.display='block';
+  }
+  inp.addEventListener('input',()=>showSugg(inp.value));
+  inp.addEventListener('focus',()=>showSugg(inp.value));
+  inp.addEventListener('blur',()=>setTimeout(()=>dd.style.display='none',150));
+}
+
+function applyVendorSelection(v){
+  const fi=document.getElementById('f-vendor');
+  const fc=document.getElementById('f-vendor-contact');
+  const fp=document.getElementById('f-vendor-phone');
+  if(fi)fi.value=v.name;
+  if(fc)fc.value=v.contact||'';
+  if(fp)fp.value=v.phone||'';
+  const newCat=ITEM_CATS.includes(v.category)?v.category:'';
+  if(newCat!==selectedVendorCat){selectedVendorCat=newCat;renderCatTabs();}
+}
+
+/* ── VENDOR MODAL ── */
+function openVendorModal(){vendorCatFilter='';renderVendorModal();document.getElementById('vendor-modal').classList.add('open');}
+function closeVendorModal(){document.getElementById('vendor-modal').classList.remove('open');}
+
+function renderVendorModal(){
+  if(activeVTab==='select')renderVendorSelectTab();
+  else renderVendorManageTab();
+}
+
+function renderVendorSelectTab(){
+  const vendors=loadVendors();
+  const filtered=vendorCatFilter?vendors.filter(v=>v.category===vendorCatFilter):vendors;
+  const filterBtns=VENDOR_CATS.map(c=>`<button class="cat-filter-btn${vendorCatFilter===c?' active':''}" data-cat="${esc(c)}">${esc(c)}</button>`).join('');
+  let cardsHtml=filtered.length===0
+    ?'<div class="modal-empty">해당 카테고리에 업체가 없습니다.<br>업체 등록/관리 탭에서 추가하세요.</div>'
+    :'<div class="vendor-cards-grid">'+filtered.map(v=>`
+      <div class="vendor-select-card" data-vid="${esc(v.id)}">
+        <div class="vsc-name">${esc(v.name)} ${catBadge(v.category)}</div>
+        <div class="vsc-info">${v.contact?'담당: '+esc(v.contact):''}${v.contact&&v.phone?' · ':''}${v.phone?esc(v.phone):''}</div>
+        ${v.memo?`<div class="vsc-info">${esc(v.memo)}</div>`:''}
+      </div>`).join('')+'</div>';
+
+  document.getElementById('vendor-modal-body').innerHTML=`
+    <div class="cat-filter-row">
+      <button class="cat-filter-btn${!vendorCatFilter?' active':''}" data-cat="">전체</button>
+      ${filterBtns}
+    </div>${cardsHtml}`;
+
+  document.querySelectorAll('.cat-filter-btn').forEach(btn=>{
+    btn.addEventListener('click',function(){vendorCatFilter=this.dataset.cat;renderVendorModal();});
+  });
+  document.querySelectorAll('.vendor-select-card').forEach(card=>{
+    card.addEventListener('click',function(){
+      const v=loadVendors().find(v=>v.id===this.dataset.vid);
+      if(v){applyVendorSelection(v);closeVendorModal();}
+    });
+  });
+}
+
+function renderVendorManageTab(){
+  const vendors=loadVendors();
+  const ev=editingVendorId?vendors.find(v=>v.id===editingVendorId):null;
+  const selCat=ev?ev.category:'';
+  const catOpts=VENDOR_CATS.map(c=>`<option value="${esc(c)}" ${selCat===c?'selected':''}>${esc(c)}</option>`).join('');
+  const isCustom=selCat&&!VENDOR_CATS.slice(0,-1).includes(selCat)&&selCat!=='기타';
+  const customVal=isCustom?selCat:'';
+  const showCustom=(selCat==='기타'||isCustom)?'':'display:none;';
+
+  const listHtml=vendors.length===0?'<div class="modal-empty">등록된 업체가 없습니다.</div>'
+    :vendors.map(v=>`
+      <div class="vendor-list-item">
+        <div class="vli-info"><div class="vli-name">${esc(v.name)} ${catBadge(v.category)}</div>
+          <div class="vli-meta">${v.contact?'담당: '+esc(v.contact):''}${v.contact&&v.phone?' · ':''}${v.phone?esc(v.phone):''}</div></div>
+        <div class="vli-actions">
+          <button class="btn-vli" data-edit-v="${esc(v.id)}">수정</button>
+          <button class="btn-vli del" data-del-v="${esc(v.id)}">삭제</button>
+        </div>
+      </div>`).join('');
+
+  document.getElementById('vendor-modal-body').innerHTML=`
+    <div class="vendor-form-box">
+      <div class="vendor-form-title">${ev?'업체 수정':'업체 등록'}</div>
+      <div class="vf-grid">
+        <div><div class="vfg-label">업체명 *</div><input class="form-input" id="vf-name" placeholder="업체명" value="${esc(ev?ev.name:'')}"/></div>
+        <div><div class="vfg-label">카테고리 *</div>
+          <select class="form-select" id="vf-category">${catOpts}</select>
+          <input class="form-input" id="vf-cat-custom" placeholder="직접 입력" style="margin-top:6px;${showCustom}" value="${esc(customVal)}"/>
+        </div>
+        <div><div class="vfg-label">담당자명</div><input class="form-input" id="vf-contact" placeholder="담당자명" value="${esc(ev?ev.contact:'')}"/></div>
+        <div><div class="vfg-label">연락처</div><input class="form-input" id="vf-phone" placeholder="010-0000-0000" value="${esc(ev?ev.phone:'')}"/></div>
+        <div><div class="vfg-label">사업자등록번호</div><input class="form-input" id="vf-bizno" placeholder="000-00-00000" value="${esc(ev?ev.bizNo:'')}"/></div>
+        <div><div class="vfg-label">주소/메모</div><input class="form-input" id="vf-memo-v" placeholder="주소 또는 특이사항" value="${esc(ev?ev.memo:'')}"/></div>
+      </div>
+      <div class="vendor-form-actions">
+        ${ev?'<button class="btn btn-outline btn-sm" id="vf-cancel">취소</button>':''}
+        <button class="btn btn-primary btn-sm" id="vf-save">${ev?'수정 저장':'업체 저장'}</button>
+      </div>
+    </div>
+    <div class="vendor-list-section-title">등록된 업체 (${vendors.length}개)</div>
+    <div class="vendor-list">${listHtml}</div>`;
+
+  document.getElementById('vf-category').addEventListener('change',function(){
+    document.getElementById('vf-cat-custom').style.display=this.value==='기타'?'':'none';
+  });
+  document.getElementById('vf-save').addEventListener('click',saveVendorForm);
+  const cancelV=document.getElementById('vf-cancel');
+  if(cancelV)cancelV.addEventListener('click',()=>{editingVendorId=null;renderVendorModal();});
+  document.querySelectorAll('[data-edit-v]').forEach(btn=>{
+    btn.addEventListener('click',function(){editingVendorId=this.dataset.editV;renderVendorModal();});
+  });
+  document.querySelectorAll('[data-del-v]').forEach(btn=>{
+    btn.addEventListener('click',function(){
+      const v=loadVendors().find(v=>v.id===this.dataset.delV);
+      if(!v||!confirm(`"${v.name}" 업체를 삭제하시겠습니까?`))return;
+      saveVendors(loadVendors().filter(v=>v.id!==this.dataset.delV));
+      if(editingVendorId===this.dataset.delV)editingVendorId=null;
+      renderVendorModal();
+    });
+  });
+}
+
+function saveVendorForm(){
+  const name=document.getElementById('vf-name').value.trim();
+  if(!name){alert('업체명을 입력하세요.');return;}
+  let cat=document.getElementById('vf-category').value;
+  if(cat==='기타'){const c=document.getElementById('vf-cat-custom').value.trim();if(c)cat=c;}
+  const vendor={id:editingVendorId||newId('v'),name,category:cat,
+    contact:document.getElementById('vf-contact').value.trim(),
+    phone:document.getElementById('vf-phone').value.trim(),
+    bizNo:document.getElementById('vf-bizno').value.trim(),
+    memo:document.getElementById('vf-memo-v').value.trim()};
+  const vendors=loadVendors();
+  if(editingVendorId){const idx=vendors.findIndex(v=>v.id===editingVendorId);if(idx>=0)vendors[idx]=vendor;}
+  else vendors.push(vendor);
+  saveVendors(vendors);editingVendorId=null;renderVendorModal();
+}
+
+/* ── MANAGER MODAL ── */
+function openManagerModal(){renderManagerModal();document.getElementById('manager-modal').classList.add('open');}
+function closeManagerModal(){document.getElementById('manager-modal').classList.remove('open');}
+
+function renderManagerModal(){
+  const managers=loadManagers();
+  const em=editingManagerId?managers.find(m=>m.id===editingManagerId):null;
+  const selRole=em?em.role:'';
+  const isCustomRole=selRole&&!['디자이너','현장소장'].includes(selRole);
+  const roleOpts=['디자이너','현장소장','기타'].map(r=>`<option value="${esc(r)}" ${selRole===r?'selected':''}>${esc(r)}</option>`).join('');
+
+  const listHtml=managers.length===0?'<div class="modal-empty">등록된 담당자가 없습니다.</div>'
+    :managers.map(m=>`
+      <div class="vendor-list-item selectable" data-select-mgr="${esc(m.name)}">
+        <div class="vli-info"><div class="vli-name">${esc(m.name)} <span class="cat-badge" style="background:#eff6ff;color:#2563eb;">${esc(m.role||'')}</span></div>
+          <div class="vli-meta">${m.phone?esc(m.phone):'연락처 없음'}</div></div>
+        <div class="vli-actions" onclick="event.stopPropagation()">
+          <button class="btn-vli" data-edit-m="${esc(m.id)}">수정</button>
+          <button class="btn-vli del" data-del-m="${esc(m.id)}">삭제</button>
+        </div>
+      </div>`).join('');
+
+  document.getElementById('manager-modal-body').innerHTML=`
+    <div class="vendor-list-section-title">담당자 목록 — 클릭하여 선택</div>
+    <div class="vendor-list" style="margin-bottom:20px;">${listHtml}</div>
+    <div class="vendor-form-box">
+      <div class="vendor-form-title">${em?'담당자 수정':'담당자 등록'}</div>
+      <div class="vf-grid">
+        <div><div class="vfg-label">이름 *</div><input class="form-input" id="mf-name" placeholder="담당자 이름" value="${esc(em?em.name:'')}"/></div>
+        <div><div class="vfg-label">연락처</div><input class="form-input" id="mf-phone" placeholder="010-0000-0000" value="${esc(em?em.phone:'')}"/></div>
+        <div class="vf-full"><div class="vfg-label">직책</div>
+          <select class="form-select" id="mf-role"><option value="">선택</option>${roleOpts}</select>
+          <input class="form-input" id="mf-role-custom" placeholder="직책 직접입력" style="margin-top:6px;${!isCustomRole?'display:none;':''}" value="${esc(isCustomRole?selRole:'')}"/>
+        </div>
+      </div>
+      <div class="vendor-form-actions">
+        ${em?'<button class="btn btn-outline btn-sm" id="mf-cancel">취소</button>':''}
+        <button class="btn btn-primary btn-sm" id="mf-save">${em?'수정 저장':'담당자 저장'}</button>
+      </div>
+    </div>`;
+
+  document.getElementById('mf-role').addEventListener('change',function(){
+    document.getElementById('mf-role-custom').style.display=this.value==='기타'?'':'none';
+  });
+  document.getElementById('mf-save').addEventListener('click',saveManagerForm);
+  const cancelM=document.getElementById('mf-cancel');
+  if(cancelM)cancelM.addEventListener('click',()=>{editingManagerId=null;renderManagerModal();});
+
+  document.querySelectorAll('[data-select-mgr]').forEach(el=>{
+    el.addEventListener('click',function(){
+      const inp=document.getElementById('f-site-manager');
+      if(inp)inp.value=this.dataset.selectMgr;
+      closeManagerModal();
+    });
+  });
+  document.querySelectorAll('[data-edit-m]').forEach(btn=>{
+    btn.addEventListener('click',function(){editingManagerId=this.dataset.editM;renderManagerModal();});
+  });
+  document.querySelectorAll('[data-del-m]').forEach(btn=>{
+    btn.addEventListener('click',function(){
+      const m=loadManagers().find(m=>m.id===this.dataset.delM);
+      if(!m||!confirm(`"${m.name}" 담당자를 삭제하시겠습니까?`))return;
+      saveManagers(loadManagers().filter(m=>m.id!==this.dataset.delM));
+      if(editingManagerId===this.dataset.delM)editingManagerId=null;
+      renderManagerModal();
+    });
+  });
+}
+
+function saveManagerForm(){
+  const name=document.getElementById('mf-name').value.trim();
+  if(!name){alert('이름을 입력하세요.');return;}
+  let role=document.getElementById('mf-role').value;
+  if(role==='기타'){const c=document.getElementById('mf-role-custom').value.trim();if(c)role=c;}
+  const manager={id:editingManagerId||newId('mgr'),name,
+    phone:document.getElementById('mf-phone').value.trim(),role};
+  const managers=loadManagers();
+  if(editingManagerId){const idx=managers.findIndex(m=>m.id===editingManagerId);if(idx>=0)managers[idx]=manager;}
+  else managers.push(manager);
+  saveManagers(managers);editingManagerId=null;renderManagerModal();
+}
+
+/* ── BULK INPUT ── */
+function openBulkModal(){document.getElementById('bulk-textarea').value='';document.getElementById('bulk-modal').classList.add('open');setTimeout(()=>document.getElementById('bulk-textarea').focus(),100);}
+function closeBulkModal(){document.getElementById('bulk-modal').classList.remove('open');}
+function applyBulkInput(){
+  document.getElementById('bulk-textarea').value.split('\n').forEach(line=>{
+    const parts=line.split('\t');
+    const name=(parts[0]||'').trim();
+    if(!name)return;
+    addItemRow({id:newId('i'),name,qty:(parts[1]||'').trim(),note:(parts[2]||'').trim()});
+  });
+  closeBulkModal();
+}
+
+/* ── PDF PRINT ── */
+function doPrint(){
+  const order=gatherOrder();
+  const projects=loadProjects();
+  const proj=projects.find(p=>p.id===order.projectId);
+  const projName=proj?proj.name:'';
+
+  const allCats=ITEM_CATS.filter(c=>(order.categories[c]||[]).some(i=>i.name));
+  let itemsHtml='';
+  if(allCats.length===0){
+    itemsHtml='<p style="color:#999;text-align:center;padding:20px;">품목 없음</p>';
+  } else {
+    allCats.forEach(cat=>{
+      const items=(order.categories[cat]||[]).filter(i=>i.name);
+      itemsHtml+=`<div class="p-cat-label">${esc(cat)}</div>
+        <table class="p-items">
+          <thead><tr><th style="width:36px;">#</th><th>품목명</th><th style="width:80px;text-align:center;">수량</th><th>비고</th></tr></thead>
+          <tbody>${items.map((it,i)=>`<tr><td style="text-align:center;">${i+1}</td><td>${esc(it.name)}</td><td style="text-align:center;">${esc(it.qty)}</td><td>${esc(it.note)}</td></tr>`).join('')}</tbody>
+        </table>`;
+    });
+  }
+
+  const today=new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'});
+
+  document.getElementById('print-area').innerHTML=`
+    <div class="p-wrap">
+      <div class="p-top">
+        <div class="p-brand"><div class="p-logo">GY</div><span class="p-brand-name">공간여운</span></div>
+        <div class="p-title-block"><div class="p-title">발주서</div><div class="p-order-no">${esc(order.id)}</div></div>
+      </div>
+      <table class="p-info">
+        <tr><th>현장명</th><td>${esc(projName)}</td><th>발주일</th><td>${esc(fmtDate(order.orderDate))}</td></tr>
+        <tr><th>현장 주소</th><td colspan="3">${esc(order.siteAddress)}</td></tr>
+        <tr><th>업체명</th><td>${esc(order.vendor)}</td><th>납품예정일</th><td>${esc(fmtDate(order.deliveryDate))}</td></tr>
+        <tr><th>업체 담당자</th><td>${esc(order.vendorContact)}</td><th>업체 연락처</th><td>${esc(order.vendorPhone)}</td></tr>
+        <tr><th>현장 담당자</th><td colspan="3">${esc(order.siteManager)}</td></tr>
+      </table>
+      <div class="p-section-label">품목 목록</div>
+      ${itemsHtml}
+      ${order.memo?`<div class="p-memo"><strong>메모:</strong><br>${esc(order.memo)}</div>`:''}
+      <div class="p-sign">
+        <table class="p-sign-table">
+          <tr><th>발주자</th><td>&nbsp;</td></tr>
+          <tr><th>서명</th><td>&nbsp;</td></tr>
+          <tr><th>날짜</th><td>${today}</td></tr>
+        </table>
+      </div>
+    </div>`;
+
+  window.print();
+}
+
+/* ── RENDER PAGE ── */
+function renderPage(){
+  if(!orderData)return;
+  const isDone=orderData.status==='납품완료';
+  const projects=loadProjects();
+  const projMap={};projects.forEach(p=>projMap[p.id]=p);
+  const projOpts=projects.map(p=>`<option value="${esc(p.id)}" ${orderData.projectId===p.id?'selected':''}>${esc(p.name)}</option>`).join('');
+
+  // Resolve initial site address
+  const siteAddress=orderData.siteAddress||(projMap[orderData.projectId]&&projMap[orderData.projectId].address)||'';
+  const backHref=orderData.projectId?'orders.html?project='+orderData.projectId:'orders.html';
+
+  const activeTabs=getActiveTabs();
+  const tabsHtml=activeTabs.map(c=>
+    `<button class="cat-tab${c===currentCat?' active':''}" data-cat="${esc(c)}">${esc(c)} <span class="cat-count-badge"></span></button>`
+  ).join('');
+
+  document.getElementById('content').innerHTML=`
+    <div class="breadcrumb"><a href="${esc(backHref)}">← 발주서 목록</a><span>/</span><span>${esc(orderData.id)}</span></div>
+
+    <div class="page-header">
+      <div class="page-order-no">${esc(orderData.id)}</div>
+      <span class="status-badge ${isDone?'badge-done':'badge-wait'}">${isDone?'납품완료':'대기중'}</span>
+      <div class="ph-sep"></div>
+      <div class="ph-actions">
+        ${!isNew?`<button class="btn btn-danger" id="btn-delete">삭제</button>`:''}
+        <button class="btn btn-print" id="btn-print">🖨 PDF 출력</button>
+        <button class="btn ${isDone?'btn-status-wait':'btn-status-done'}" id="btn-toggle">${isDone?'대기중으로':'납품완료로'} 변경</button>
+        <button class="btn btn-primary" id="btn-save">저장 후 목록으로</button>
+      </div>
+    </div>
+
+    <!-- 기본 정보 -->
+    <div class="card">
+      <div class="card-title">기본 정보</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">현장명</label>
+          <select class="form-select" id="f-project"><option value="">현장 선택</option>${projOpts}</select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">업체명 *</label>
+          <div class="input-btn-row">
+            <div class="autocomplete-wrap">
+              <input class="form-input" id="f-vendor" placeholder="업체명 입력" value="${esc(orderData.vendor)}" autocomplete="off"/>
+              <div class="autocomplete-dropdown" id="vendor-dropdown"></div>
+            </div>
+            <button class="btn-mgr" id="btn-open-vendor">🏢 업체 관리</button>
+          </div>
+        </div>
+        <div class="form-group col-2">
+          <label class="form-label">현장 주소</label>
+          <input class="form-input" id="f-site-address" placeholder="현장 주소" value="${esc(siteAddress)}"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">업체 담당자</label>
+          <input class="form-input" id="f-vendor-contact" placeholder="업체 담당자명" value="${esc(orderData.vendorContact||'')}"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">업체 연락처</label>
+          <input class="form-input" id="f-vendor-phone" placeholder="010-0000-0000" value="${esc(orderData.vendorPhone||'')}"/>
+        </div>
+        <div class="form-group col-2">
+          <label class="form-label">현장 담당자</label>
+          <div class="input-btn-row">
+            <input class="form-input" id="f-site-manager" placeholder="현장 담당자명" value="${esc(orderData.siteManager||'')}"/>
+            <button class="btn-mgr" id="btn-open-manager">👤 담당자 관리</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">발주일 *</label>
+          <input class="form-input" type="date" id="f-order-date" value="${esc(orderData.orderDate)}"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">납품예정일</label>
+          <input class="form-input" type="date" id="f-delivery-date" value="${esc(orderData.deliveryDate)}"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- 품목 -->
+    <div class="items-card">
+      <div class="items-card-head"><div class="items-card-title">품목</div></div>
+      <div class="cat-tabs-row">
+        <div class="cat-tabs" id="cat-tabs">${tabsHtml}</div>
+        <button class="btn-bulk" id="btn-open-bulk">일괄입력</button>
+      </div>
+      <div class="items-table-wrap">
+        <div class="items-head">
+          <div style="text-align:center;">#</div><div>품목명</div>
+          <div style="text-align:center;">수량</div><div>비고</div><div></div>
+        </div>
+        <div class="items-body" id="items-body"></div>
+      </div>
+      <div class="items-footer"><button class="btn-add-row" id="btn-add-row">＋ 행 추가</button></div>
+    </div>
+
+    <!-- 메모 -->
+    <div class="card">
+      <div class="card-title">메모</div>
+      <textarea class="form-input" id="f-memo" placeholder="납품 조건, 특이사항 등">${esc(orderData.memo)}</textarea>
+    </div>
+  `;
+
+  /* events */
+  document.getElementById('btn-save').addEventListener('click',()=>doSave(true));
+  document.getElementById('btn-toggle').addEventListener('click',doToggleStatus);
+  document.getElementById('btn-print').addEventListener('click',doPrint);
+  const delBtn=document.getElementById('btn-delete');
+  if(delBtn)delBtn.addEventListener('click',doDelete);
+  document.getElementById('btn-open-vendor').addEventListener('click',openVendorModal);
+  document.getElementById('btn-open-manager').addEventListener('click',openManagerModal);
+  document.getElementById('btn-open-bulk').addEventListener('click',openBulkModal);
+  document.getElementById('btn-add-row').addEventListener('click',()=>addItemRow());
+
+  document.querySelectorAll('.cat-tab').forEach(btn=>{
+    btn.addEventListener('click',function(){switchCat(this.dataset.cat);});
+  });
+
+  /* project change → address auto-fill */
+  document.getElementById('f-project').addEventListener('change',function(){
+    const proj=projMap[this.value];
+    const addrEl=document.getElementById('f-site-address');
+    if(addrEl)addrEl.value=proj?(proj.address||''):'';
+  });
+
+  renderItemsBody(currentCat);
+  updateTabCounts();
+  initAutocomplete();
+}
+
+/* ── MODAL EVENTS (static) ── */
+document.getElementById('close-vendor-modal').addEventListener('click',closeVendorModal);
+document.getElementById('vendor-modal').addEventListener('click',function(e){if(e.target===this)closeVendorModal();});
+document.getElementById('vendor-modal-tabs').querySelectorAll('[data-vtab]').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    activeVTab=this.dataset.vtab;
+    document.querySelectorAll('[data-vtab]').forEach(b=>b.classList.toggle('active',b.dataset.vtab===activeVTab));
+    renderVendorModal();
+  });
+});
+
+document.getElementById('close-manager-modal').addEventListener('click',closeManagerModal);
+document.getElementById('manager-modal').addEventListener('click',function(e){if(e.target===this)closeManagerModal();});
+
+document.getElementById('close-bulk-modal').addEventListener('click',closeBulkModal);
+document.getElementById('cancel-bulk').addEventListener('click',closeBulkModal);
+document.getElementById('apply-bulk').addEventListener('click',applyBulkInput);
+document.getElementById('bulk-modal').addEventListener('click',function(e){if(e.target===this)closeBulkModal();});
+
+/* ── BOOT ── */
+initOrderData();
+initSelectedVendorCat();
+renderPage();
+</script>
+</body>
+</html>

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>공간여운 — 로그인</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:           #f5f3f0;
+      --surface:      #ffffff;
+      --sidebar:      #1c1917;
+      --accent:       #b5945a;
+      --accent-light: #d4b483;
+      --accent-pale:  #f5ead8;
+      --text:         #1c1917;
+      --text-sub:     #78716c;
+      --text-muted:   #a8a29e;
+      --border:       #e7e5e4;
+      --red-bg:       #fff1f2;
+      --radius-sm:    8px;
+    }
+
+    body {
+      font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .login-wrap {
+      display: flex;
+      min-height: 100vh;
+      align-items: stretch;
+    }
+
+    /* LEFT PANEL */
+    .login-left {
+      flex: 1;
+      background: var(--sidebar);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 60px 48px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-left::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 30% 20%, rgba(181,148,90,.18) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 60% at 80% 80%, rgba(181,148,90,.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .login-brand {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+
+    .brand-logo {
+      width: 72px;
+      height: 72px;
+      background: var(--accent);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 28px;
+      font-size: 28px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -1px;
+    }
+
+    .brand-name {
+      font-size: 32px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -.5px;
+      margin-bottom: 8px;
+    }
+
+    .brand-name span { color: var(--accent-light); }
+
+    .brand-sub {
+      font-size: 14px;
+      color: #a8a29e;
+      letter-spacing: .5px;
+    }
+
+    .login-feature-list {
+      margin-top: 64px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 100%;
+      max-width: 320px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .login-feature {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .login-feature-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(181,148,90,.15);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .login-feature-text strong {
+      display: block;
+      color: #e7e5e4;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .login-feature-text span { color: #78716c; font-size: 12px; }
+
+    /* RIGHT PANEL */
+    .login-right {
+      width: 480px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 48px;
+      background: var(--surface);
+    }
+
+    .login-form-wrap {
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .login-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .login-title-sub {
+      font-size: 14px;
+      color: var(--text-sub);
+      margin-bottom: 40px;
+    }
+
+    .form-group { margin-bottom: 20px; }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 13px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      color: var(--text);
+      background: var(--bg);
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .form-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(181,148,90,.12);
+      background: #fff;
+    }
+
+    .form-input::placeholder { color: var(--text-muted); }
+
+    .form-options {
+      display: flex;
+      align-items: center;
+      margin-bottom: 28px;
+    }
+
+    .form-check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-sub);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .form-check input[type=checkbox] {
+      accent-color: var(--accent);
+      width: 15px;
+      height: 15px;
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 14px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: .2px;
+      transition: background .2s, transform .1s;
+    }
+
+    .btn-login:hover  { background: #a07d44; }
+    .btn-login:active { transform: scale(.99); }
+    .btn-login:disabled { opacity: .7; cursor: default; transform: none; }
+
+    .login-error {
+      display: none;
+      background: var(--red-bg);
+      border: 1px solid #fecaca;
+      color: #dc2626;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+
+    .login-error.visible { display: block; }
+
+    .login-contact {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .login-footer {
+      margin-top: 36px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 820px) {
+      .login-wrap { flex-direction: column; }
+      .login-left { padding: 40px 24px; }
+      .login-right { width: 100%; padding: 40px 24px; }
+      .login-feature-list { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <script>
+    if (localStorage.getItem('ppstudio_user')) {
+      window.location.replace('dashboard.html');
+    }
+  </script>
+
+  <div class="login-wrap">
+
+    <!-- LEFT -->
+    <div class="login-left">
+      <div class="login-brand">
+        <div class="brand-logo">GY</div>
+        <div class="brand-name">공간<span>여운</span></div>
+        <div class="brand-sub">인테리어 통합 업무 플랫폼</div>
+      </div>
+
+      <div class="login-feature-list">
+        <div class="login-feature">
+          <div class="login-feature-icon">🏗️</div>
+          <div class="login-feature-text">
+            <strong>프로젝트 통합 관리</strong>
+            <span>견적부터 준공까지 한눈에</span>
+          </div>
+        </div>
+        <div class="login-feature">
+          <div class="login-feature-icon">👥</div>
+          <div class="login-feature-text">
+            <strong>고객 &amp; 상담 관리</strong>
+            <span>상담 이력과 요청사항 추적</span>
+          </div>
+        </div>
+        <div class="login-feature">
+          <div class="login-feature-icon">📐</div>
+          <div class="login-feature-text">
+            <strong>자재 &amp; 시공 스케줄</strong>
+            <span>팀원별 일정 및 자재 발주 현황</span>
+          </div>
+        </div>
+        <div class="login-feature">
+          <div class="login-feature-icon">📊</div>
+          <div class="login-feature-text">
+            <strong>매출 &amp; 손익 분석</strong>
+            <span>월별 실적 및 수익 리포트</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="login-right">
+      <div class="login-form-wrap">
+        <div class="login-title">로그인</div>
+        <div class="login-title-sub">공간여운 업무 계정으로 로그인하세요</div>
+
+        <div class="login-error" id="login-error"></div>
+
+        <div class="form-group">
+          <label class="form-label" for="username">아이디</label>
+          <input class="form-input" id="username" type="text"
+            placeholder="아이디 입력" autocomplete="username" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="password">비밀번호</label>
+          <input class="form-input" id="password" type="password"
+            placeholder="비밀번호를 입력하세요" autocomplete="current-password" />
+        </div>
+
+        <div class="form-options">
+          <label class="form-check">
+            <input type="checkbox" id="remember" /> 로그인 상태 유지
+          </label>
+        </div>
+
+        <button class="btn-login" id="login-btn">로그인</button>
+
+        <div class="login-contact">계정 문의: 관리자에게 연락하세요</div>
+        <div class="login-footer">&copy; 2026 공간여운. All rights reserved.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const ACCOUNTS = [
+      { username: 'kyuni', password: '0041700', name: '관리자', role: 'admin' }
+    ];
+
+    const loginBtn = document.getElementById('login-btn');
+    const errEl    = document.getElementById('login-error');
+
+    function showError(msg) {
+      errEl.textContent = msg;
+      errEl.classList.add('visible');
+    }
+
+    function doLogin() {
+      const username = document.getElementById('username').value.trim();
+      const pw       = document.getElementById('password').value;
+
+      errEl.classList.remove('visible');
+
+      if (!username || !pw) {
+        showError('아이디와 비밀번호를 입력해주세요.');
+        return;
+      }
+
+      const account = ACCOUNTS.find(a => a.username === username && a.password === pw);
+
+      if (!account) {
+        showError('아이디 또는 비밀번호가 올바르지 않습니다.');
+        return;
+      }
+
+      loginBtn.textContent = '로그인 중...';
+      loginBtn.disabled    = true;
+
+      localStorage.setItem('ppstudio_user', JSON.stringify({
+        username: account.username,
+        name:     account.name,
+        role:     account.role
+      }));
+
+      setTimeout(() => { window.location.href = 'dashboard.html'; }, 600);
+    }
+
+    loginBtn.addEventListener('click', doLogin);
+    document.getElementById('password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+    document.getElementById('username').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('password').focus(); });
+  </script>
+</body>
+</html>

@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>공간여운 — 프로젝트 상세</title>
+  <script>
+    (function () {
+      if (!localStorage.getItem('ppstudio_user')) window.location.replace('login.html');
+    })();
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:            #f5f3f0;
+      --surface:       #ffffff;
+      --sidebar:       #1c1917;
+      --sidebar-hover: #292524;
+      --accent:        #b5945a;
+      --accent-light:  #d4b483;
+      --accent-pale:   #f5ead8;
+      --text:          #1c1917;
+      --text-sub:      #78716c;
+      --text-muted:    #a8a29e;
+      --border:        #e7e5e4;
+      --green:         #4ade80;
+      --green-bg:      #f0fdf4;
+      --shadow-sm:     0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+      --shadow:        0 4px 16px rgba(0,0,0,.10);
+      --radius:        12px;
+      --radius-sm:     8px;
+    }
+
+    body {
+      font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ══ HEADER ══ */
+    .header {
+      background: var(--sidebar);
+      height: 64px;
+      display: flex; align-items: center;
+      padding: 0 28px; gap: 16px;
+      flex-shrink: 0;
+      position: sticky; top: 0; z-index: 100;
+      border-bottom: 1px solid #292524;
+    }
+    .header-brand { display: flex; align-items: center; gap: 12px; }
+    .header-logo {
+      width: 36px; height: 36px; background: var(--accent);
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 800; color: #fff; flex-shrink: 0;
+    }
+    .header-brand-name { font-size: 18px; font-weight: 700; color: #fff; letter-spacing: -.3px; }
+    .header-brand-name span { color: var(--accent-light); }
+    .header-sep { flex: 1; }
+    .header-date { font-size: 13px; color: #57534e; }
+    .header-user { display: flex; align-items: center; gap: 10px; }
+    .header-avatar {
+      width: 34px; height: 34px; background: var(--accent); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .header-user-name { font-size: 14px; font-weight: 600; color: #e7e5e4; }
+    .btn-logout {
+      padding: 7px 16px; background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.12); border-radius: var(--radius-sm);
+      color: #a8a29e; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: background .15s, color .15s;
+    }
+    .btn-logout:hover { background: rgba(255,255,255,.13); color: #e7e5e4; }
+
+    /* ══ LAYOUT ══ */
+    .layout { display: flex; flex: 1; min-height: 0; }
+
+    /* ══ SIDEBAR ══ */
+    .sidebar {
+      width: 220px; background: var(--sidebar);
+      display: flex; flex-direction: column; flex-shrink: 0;
+      position: sticky; top: 64px;
+      height: calc(100vh - 64px); overflow-y: auto;
+      border-right: 1px solid #292524;
+    }
+    .sidebar-nav { flex: 1; padding: 16px 10px; display: flex; flex-direction: column; gap: 2px; }
+    .nav-section-label {
+      font-size: 10px; font-weight: 600; color: #57534e;
+      letter-spacing: 1px; text-transform: uppercase;
+      padding: 12px 12px 6px; margin-top: 4px;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border-radius: var(--radius-sm);
+      cursor: pointer; transition: background .15s, color .15s;
+      color: #a8a29e; font-size: 13.5px; font-weight: 500;
+      border: none; background: none; width: 100%;
+      text-align: left; text-decoration: none;
+    }
+    .nav-item:hover  { background: var(--sidebar-hover); color: #e7e5e4; }
+    .nav-item.active { background: rgba(181,148,90,.15); color: var(--accent-light); }
+    .nav-icon { font-size: 16px; flex-shrink: 0; }
+
+    /* ══ MAIN ══ */
+    .main { flex: 1; min-width: 0; overflow-y: auto; }
+    .content { padding: 32px; display: flex; flex-direction: column; gap: 24px; max-width: 1000px; }
+
+    /* ══ BREADCRUMB ══ */
+    .breadcrumb {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 13px; color: var(--text-muted);
+    }
+    .breadcrumb a {
+      color: var(--accent); font-weight: 600; text-decoration: none;
+      display: flex; align-items: center; gap: 4px;
+      transition: opacity .15s;
+    }
+    .breadcrumb a:hover { opacity: .75; }
+
+    /* ══ DETAIL HEADER ══ */
+    .detail-header {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 20px;
+    }
+    .detail-header-left { display: flex; flex-direction: column; gap: 10px; }
+    .project-title { font-size: 28px; font-weight: 800; color: var(--text); letter-spacing: -.5px; line-height: 1.2; }
+    .title-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .stage-badge {
+      display: inline-flex; align-items: center;
+      padding: 4px 12px; border-radius: 20px;
+      font-size: 13px; font-weight: 700;
+    }
+    .detail-header-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; padding-top: 6px; }
+
+    .btn-next-stage {
+      display: flex; align-items: center; gap: 6px;
+      padding: 9px 18px;
+      background: var(--sidebar); color: var(--accent-light);
+      border: 1.5px solid #3a3330;
+      border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 700;
+      cursor: pointer; transition: background .15s, border-color .15s;
+      white-space: nowrap;
+    }
+    .btn-next-stage:hover { background: #292524; border-color: var(--accent); }
+
+    .btn-edit {
+      padding: 9px 20px;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 700;
+      color: var(--text-sub);
+      cursor: pointer; transition: border-color .15s, color .15s;
+      white-space: nowrap;
+    }
+    .btn-edit:hover { border-color: var(--accent); color: var(--accent); }
+
+    .btn-save {
+      padding: 9px 20px;
+      background: var(--accent); color: #fff;
+      border: none; border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 700;
+      cursor: pointer; transition: background .15s;
+      white-space: nowrap;
+    }
+    .btn-save:hover { background: #a07d44; }
+
+    .btn-cancel-edit {
+      padding: 9px 16px;
+      background: var(--surface); color: var(--text-sub);
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: background .15s;
+      white-space: nowrap;
+    }
+    .btn-cancel-edit:hover { background: var(--bg); }
+
+    /* ══ NEXT STAGE CONFIRM BAR ══ */
+    .confirm-bar {
+      display: none;
+      background: var(--sidebar);
+      border: 1px solid #3a3330;
+      border-radius: var(--radius-sm);
+      padding: 12px 18px;
+      align-items: center; gap: 14px;
+      flex-wrap: wrap;
+    }
+    .confirm-bar.open { display: flex; }
+    .confirm-bar-msg { font-size: 13.5px; color: #e7e5e4; flex: 1; }
+    .confirm-bar-msg strong { color: var(--accent-light); }
+    .btn-confirm-yes {
+      padding: 7px 18px; background: var(--accent); color: #fff;
+      border: none; border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 700; cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-confirm-yes:hover { background: #a07d44; }
+    .btn-confirm-no {
+      padding: 7px 14px; background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.15); border-radius: var(--radius-sm);
+      color: #a8a29e; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: background .15s;
+    }
+    .btn-confirm-no:hover { background: rgba(255,255,255,.12); color: #e7e5e4; }
+
+    /* ══ CARD ══ */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 18px 24px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .card-title { font-size: 14px; font-weight: 700; color: var(--text); }
+    .card-body { padding: 20px 24px; }
+
+    /* ══ INFO GRID ══ */
+    .info-sections { display: flex; flex-direction: column; gap: 0; }
+
+    .info-section {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .info-section:last-child { border-bottom: none; }
+
+    .info-section-title {
+      font-size: 11px; font-weight: 700; color: var(--text-muted);
+      letter-spacing: .8px; text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px 24px;
+    }
+    .info-full { grid-column: 1 / -1; }
+
+    .info-item { display: flex; flex-direction: column; gap: 5px; }
+
+    .info-label {
+      font-size: 11.5px; font-weight: 600;
+      color: var(--text-muted); letter-spacing: .3px;
+    }
+
+    .info-value {
+      font-size: 14px; font-weight: 500; color: var(--text);
+      min-height: 22px;
+    }
+    .info-value.empty { color: var(--text-muted); font-style: italic; }
+
+    .info-value.amount { font-weight: 700; color: var(--accent); }
+
+    /* edit inputs */
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 13.5px; color: var(--text);
+      background: var(--bg); outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      font-family: inherit;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(181,148,90,.1);
+      background: #fff;
+    }
+    .form-input::placeholder, .form-textarea::placeholder { color: var(--text-muted); }
+    .form-textarea { resize: vertical; min-height: 80px; }
+
+    /* ══ TIMELINE ══ */
+    .timeline-scroll { overflow-x: auto; padding-bottom: 4px; }
+
+    .timeline-row {
+      display: flex;
+      align-items: flex-start;
+      min-width: 660px;
+      padding: 4px 0 8px;
+    }
+
+    .stage-node {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 7px; width: 72px; flex-shrink: 0;
+      cursor: pointer; transition: opacity .15s;
+    }
+    .stage-node:hover { opacity: .8; }
+
+    .stage-dot {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: var(--surface);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700;
+      transition: all .2s;
+      color: var(--text-muted);
+      position: relative; z-index: 1;
+    }
+
+    .stage-node.past .stage-dot {
+      background: var(--accent); border-color: var(--accent);
+      color: #fff;
+    }
+    .stage-node.current .stage-dot {
+      background: var(--accent); border-color: var(--accent);
+      color: #fff;
+      box-shadow: 0 0 0 4px rgba(181,148,90,.2);
+    }
+    .stage-node:hover .stage-dot { border-color: var(--accent); }
+    .stage-node.past:hover .stage-dot,
+    .stage-node.current:hover .stage-dot { opacity: .85; }
+
+    .stage-label {
+      font-size: 11px; font-weight: 600; color: var(--text-muted);
+      text-align: center; white-space: nowrap; line-height: 1.2;
+    }
+    .stage-node.past .stage-label    { color: var(--accent); }
+    .stage-node.current .stage-label { color: var(--accent); font-weight: 700; }
+
+    .stage-date-label {
+      font-size: 10.5px; color: var(--text-muted);
+      text-align: center; min-height: 14px;
+    }
+    .stage-node.past .stage-date-label { color: var(--text-sub); }
+
+    .stage-connector {
+      flex: 1; min-width: 12px;
+      height: 2px; background: var(--border);
+      margin-top: 16px; flex-shrink: 1;
+    }
+    .stage-connector.colored { background: var(--accent); }
+
+    /* ══ BOTTOM LINKS ══ */
+    .bottom-links {
+      display: flex; gap: 12px; flex-wrap: wrap;
+    }
+    .btn-link {
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 22px;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 13.5px; font-weight: 600;
+      color: var(--text-sub);
+      cursor: pointer; text-decoration: none;
+      transition: border-color .15s, color .15s, box-shadow .15s;
+      box-shadow: var(--shadow-sm);
+    }
+    .btn-link:hover {
+      border-color: var(--accent); color: var(--accent);
+      box-shadow: 0 4px 12px rgba(181,148,90,.12);
+    }
+
+    /* ══ STAGE DATE MODAL ══ */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.42); z-index: 200;
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--surface);
+      border-radius: var(--radius);
+      width: 100%; max-width: 380px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.22);
+      overflow: hidden;
+    }
+    .modal-header {
+      padding: 18px 22px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .modal-title { font-size: 15px; font-weight: 700; color: var(--text); }
+    .modal-close {
+      width: 30px; height: 30px;
+      display: flex; align-items: center; justify-content: center;
+      border: none; background: none; border-radius: 6px;
+      color: var(--text-muted); font-size: 14px;
+      cursor: pointer; transition: background .15s;
+    }
+    .modal-close:hover { background: var(--bg); }
+    .modal-body { padding: 20px 22px; display: flex; flex-direction: column; gap: 12px; }
+    .modal-note { font-size: 12px; color: var(--text-muted); }
+    .modal-footer {
+      padding: 14px 22px;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: flex-end; gap: 10px;
+    }
+    .btn-modal-cancel {
+      padding: 8px 18px; border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); background: var(--surface);
+      color: var(--text-sub); font-size: 13px; font-weight: 600;
+      cursor: pointer; font-family: inherit; transition: background .15s;
+    }
+    .btn-modal-cancel:hover { background: var(--bg); }
+    .btn-modal-save {
+      padding: 8px 22px; border: none; border-radius: var(--radius-sm);
+      background: var(--accent); color: #fff;
+      font-size: 13px; font-weight: 700;
+      cursor: pointer; font-family: inherit; transition: background .15s;
+    }
+    .btn-modal-save:hover { background: #a07d44; }
+
+    /* ══ NOT FOUND ══ */
+    .not-found {
+      text-align: center; padding: 80px 20px; color: var(--text-muted);
+    }
+    .not-found-icon { font-size: 48px; margin-bottom: 16px; }
+    .not-found-text { font-size: 16px; font-weight: 600; color: var(--text-sub); margin-bottom: 8px; }
+
+    /* ══ RESPONSIVE ══ */
+    @media (max-width: 700px) {
+      .sidebar { display: none; }
+      .content { padding: 20px; }
+      .info-grid { grid-template-columns: 1fr; }
+      .detail-header { flex-direction: column; gap: 14px; }
+      .detail-header-right { width: 100%; justify-content: flex-end; }
+      .header-date { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ HEADER ══ -->
+  <header class="header">
+    <div class="header-brand">
+      <div class="header-logo">GY</div>
+      <div class="header-brand-name">공간<span>여운</span></div>
+    </div>
+    <div class="header-sep"></div>
+    <div class="header-date" id="header-date"></div>
+    <div class="header-user">
+      <div class="header-avatar" id="user-avatar">관</div>
+      <div class="header-user-name" id="user-name">관리자</div>
+      <button class="btn-logout" id="logout-btn">로그아웃</button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- ══ SIDEBAR ══ -->
+    <aside class="sidebar">
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">업무</div>
+        <a class="nav-item" href="dashboard.html">
+          <span class="nav-icon">🏠</span> 대시보드
+        </a>
+        <a class="nav-item active" href="projects.html">
+          <span class="nav-icon">🏗️</span> 프로젝트 관리
+        </a>
+        <a class="nav-item" href="consultation.html">
+          <span class="nav-icon">📝</span> 회의록
+        </a>
+        <a class="nav-item" href="orders.html">
+          <span class="nav-icon">📦</span> 발주서
+        </a>
+        <button class="nav-item">
+          <span class="nav-icon">🗓️</span> 일정
+        </button>
+        <div class="nav-section-label">시스템</div>
+        <button class="nav-item">
+          <span class="nav-icon">⚙️</span> 설정
+        </button>
+      </nav>
+    </aside>
+
+    <!-- ══ MAIN ══ -->
+    <main class="main">
+      <div class="content" id="content">
+        <!-- JS로 렌더링 -->
+      </div>
+    </main>
+
+  </div>
+
+  <!-- ══ 단계 날짜 모달 ══ -->
+  <div class="modal-overlay" id="stage-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="stage-modal-title">단계 날짜 설정</div>
+        <button class="modal-close" id="stage-modal-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="info-item">
+          <label class="info-label" style="margin-bottom:6px;">날짜</label>
+          <input class="form-input" id="stage-date-input" type="date" />
+        </div>
+        <div class="modal-note">단계가 시작된 날짜를 기록합니다. 날짜를 지우면 삭제됩니다.</div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-modal-cancel" id="stage-modal-cancel">취소</button>
+        <button class="btn-modal-save" id="stage-modal-save">저장</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ── 인증 & 사용자 정보 ── */
+    const user = JSON.parse(localStorage.getItem('ppstudio_user') || 'null');
+    if (!user) window.location.replace('login.html');
+
+    document.getElementById('user-name').textContent   = user.name;
+    document.getElementById('user-avatar').textContent = user.name.charAt(0);
+    document.getElementById('header-date').textContent =
+      new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' });
+
+    document.getElementById('logout-btn').addEventListener('click', function () {
+      localStorage.removeItem('ppstudio_user');
+      window.location.href = 'login.html';
+    });
+
+    /* ── 단계 설정 ── */
+    const STAGES = ['문의', '1차상담', '현장방문/실측', '가견적', '계약', '발주', '시공', '준공', 'AS'];
+
+    const STAGE_STYLE = {
+      '문의':          { bg: '#f1f5f9', color: '#64748b' },
+      '1차상담':       { bg: '#eff6ff', color: '#3b82f6' },
+      '현장방문/실측': { bg: '#eef2ff', color: '#6366f1' },
+      '가견적':        { bg: '#fffbeb', color: '#d97706' },
+      '계약':          { bg: '#fff7ed', color: '#ea580c' },
+      '발주':          { bg: '#faf5ff', color: '#9333ea' },
+      '시공':          { bg: '#dbeafe', color: '#1d4ed8' },
+      '준공':          { bg: '#f0fdf4', color: '#16a34a' },
+      'AS':            { bg: '#fff1f2', color: '#dc2626' },
+    };
+
+    /* ── 프로젝트 데이터 ── */
+    const projectId = new URLSearchParams(location.search).get('id');
+
+    function loadProjects() {
+      return JSON.parse(localStorage.getItem('ppstudio_projects') || '[]');
+    }
+
+    function saveProjects(list) {
+      localStorage.setItem('ppstudio_projects', JSON.stringify(list));
+    }
+
+    function getProject() {
+      return loadProjects().find(p => p.id === projectId) || null;
+    }
+
+    function updateProject(updated) {
+      const list = loadProjects().map(p => p.id === projectId ? updated : p);
+      saveProjects(list);
+    }
+
+    /* ── 유틸 ── */
+    function fmtDate(iso) {
+      if (!iso) return '';
+      const [y, m, d] = iso.split('-');
+      return `${parseInt(m)}/${parseInt(d)}`;
+    }
+
+    function fmtDateLong(iso) {
+      if (!iso) return '';
+      return new Date(iso).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    function formatAmount(v) {
+      if (v == null || v === '') return null;
+      return Number(v).toLocaleString() + '만원';
+    }
+
+    /* ── 상태 ── */
+    let isEditMode = false;
+    let editSnapshot = null; // 편집 취소 시 복원용
+
+    /* ── 렌더 메인 ── */
+    function render() {
+      const proj = getProject();
+      const content = document.getElementById('content');
+
+      if (!proj) {
+        content.innerHTML = `
+          <div class="not-found">
+            <div class="not-found-icon">🔍</div>
+            <div class="not-found-text">프로젝트를 찾을 수 없습니다</div>
+            <a href="projects.html" style="color:var(--accent);font-size:13px;">← 프로젝트 목록으로</a>
+          </div>`;
+        return;
+      }
+
+      const p = Object.assign({
+        phone: '', address: '', completionDate: null, memo: '', stageDates: {}
+      }, proj);
+
+      const s = STAGE_STYLE[p.stage] || { bg: '#f1f5f9', color: '#64748b' };
+      const currentIdx = STAGES.indexOf(p.stage);
+      const isLastStage = currentIdx === STAGES.length - 1;
+
+      content.innerHTML = `
+        <!-- BREADCRUMB -->
+        <div class="breadcrumb">
+          <a href="projects.html">← 프로젝트 관리</a>
+          <span>/</span>
+          <span>${p.name}</span>
+        </div>
+
+        <!-- DETAIL HEADER -->
+        <div class="detail-header">
+          <div class="detail-header-left">
+            <h1 class="project-title" id="proj-title-display">${p.name}</h1>
+            <div class="title-meta">
+              <span class="stage-badge" style="background:${s.bg};color:${s.color};">${p.stage}</span>
+              <span style="font-size:12.5px;color:var(--text-muted);">문의 ${fmtDateLong(p.inquiryDate) || '날짜 미입력'}</span>
+            </div>
+          </div>
+          <div class="detail-header-right">
+            ${!isLastStage ? `<button class="btn-next-stage" id="btn-next-stage">다음 단계 → <strong style="color:var(--accent-light);">${STAGES[currentIdx + 1]}</strong></button>` : '<span style="font-size:13px;color:var(--text-muted);">최종 단계 완료</span>'}
+            ${isEditMode
+              ? `<button class="btn-cancel-edit" id="btn-cancel-edit">취소</button><button class="btn-save" id="btn-save-edit">저장</button>`
+              : `<button class="btn-edit" id="btn-edit">편집</button>`
+            }
+          </div>
+        </div>
+
+        <!-- NEXT STAGE CONFIRM BAR -->
+        <div class="confirm-bar" id="confirm-bar">
+          <span class="confirm-bar-msg" id="confirm-msg"></span>
+          <button class="btn-confirm-yes" id="confirm-yes">진행</button>
+          <button class="btn-confirm-no" id="confirm-no">취소</button>
+        </div>
+
+        <!-- INFO CARD -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">핵심 정보</div>
+          </div>
+          <div class="info-sections">
+
+            <!-- 기본 정보 -->
+            <div class="info-section">
+              <div class="info-section-title">기본 정보</div>
+              <div class="info-grid">
+                <div class="info-item">
+                  <div class="info-label">고객명</div>
+                  ${isEditMode
+                    ? `<input class="form-input" id="e-client" value="${p.client || ''}" placeholder="고객 이름" />`
+                    : `<div class="info-value ${!p.client ? 'empty' : ''}">${p.client || '미입력'}</div>`
+                  }
+                </div>
+                <div class="info-item">
+                  <div class="info-label">연락처</div>
+                  ${isEditMode
+                    ? `<input class="form-input" id="e-phone" value="${p.phone || ''}" placeholder="010-0000-0000" />`
+                    : `<div class="info-value ${!p.phone ? 'empty' : ''}">${p.phone || '미입력'}</div>`
+                  }
+                </div>
+                <div class="info-item info-full">
+                  <div class="info-label">현장 주소</div>
+                  ${isEditMode
+                    ? `<input class="form-input" id="e-address" value="${p.address || ''}" placeholder="예: 서울시 강남구 논현동 123" />`
+                    : `<div class="info-value ${!p.address ? 'empty' : ''}">${p.address || '미입력'}</div>`
+                  }
+                </div>
+                <div class="info-item">
+                  <div class="info-label">담당 디자이너</div>
+                  ${isEditMode
+                    ? `<input class="form-input" id="e-designer" value="${p.designer || ''}" placeholder="이름" />`
+                    : `<div class="info-value ${!p.designer ? 'empty' : ''}">${p.designer || '미배정'}</div>`
+                  }
+                </div>
+                <div class="info-item">
+                  <div class="info-label">계약금액</div>
+                  ${isEditMode
+                    ? `<input class="form-input" id="e-amount" type="number" value="${p.amount != null ? p.amount : ''}" placeholder="만원 단위" min="0" />`
+                    : `<div class="info-value ${p.amount == null ? 'empty' : 'amount'}">${p.amount != null ? Number(p.amount).toLocaleString() + '만원' : '미정'}</div>`
+                  }
+                </div>
+              </div>
+            </div>
+
+            <!-- 일정 -->
+            <div class="info-section">
+              <div class="info-section-title">일정</div>
+              <div class="info-grid">
+                <div class="info-item">
+                  <div class="info-label">문의 시작일</div>
+                  ${isEditMode
+                    ? `<input class="form-input" id="e-inquiry-date" type="date" value="${p.inquiryDate || ''}" />`
+                    : `<div class="info-value ${!p.inquiryDate ? 'empty' : ''}">${fmtDateLong(p.inquiryDate) || '미입력'}</div>`
+                  }
+                </div>
+                <div class="info-item">
+                  <div class="info-label">시공 예정일</div>
+                  ${isEditMode
+                    ? `<input class="form-input" id="e-start-date" type="date" value="${p.startDate || ''}" />`
+                    : `<div class="info-value ${!p.startDate ? 'empty' : ''}">${fmtDateLong(p.startDate) || '미정'}</div>`
+                  }
+                </div>
+                <div class="info-item">
+                  <div class="info-label">준공일</div>
+                  ${isEditMode
+                    ? `<input class="form-input" id="e-completion-date" type="date" value="${p.completionDate || ''}" />`
+                    : `<div class="info-value ${!p.completionDate ? 'empty' : ''}">${fmtDateLong(p.completionDate) || '미정'}</div>`
+                  }
+                </div>
+              </div>
+            </div>
+
+            <!-- 메모 -->
+            <div class="info-section">
+              <div class="info-section-title">메모</div>
+              ${isEditMode
+                ? `<textarea class="form-textarea" id="e-memo" placeholder="현장 관련 메모를 남겨주세요">${p.memo || ''}</textarea>`
+                : `<div class="info-value ${!p.memo ? 'empty' : ''}" style="white-space:pre-wrap;line-height:1.6;">${p.memo || '메모 없음'}</div>`
+              }
+            </div>
+
+          </div>
+        </div>
+
+        <!-- STAGE TIMELINE CARD -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">진행 단계</div>
+            <span style="font-size:12px;color:var(--text-muted);">단계를 클릭하면 날짜를 기록할 수 있습니다</span>
+          </div>
+          <div class="card-body">
+            <div class="timeline-scroll">
+              <div class="timeline-row" id="timeline-row"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BOTTOM LINKS -->
+        <div class="bottom-links">
+          <a class="btn-link" href="orders.html?project=${p.id}">
+            📦 발주서 보기
+          </a>
+          <a class="btn-link" href="consultation.html?project=${p.id}">
+            📝 회의록 보기
+          </a>
+        </div>
+      `;
+
+      /* ── 타임라인 렌더 ── */
+      renderTimeline(p);
+
+      /* ── 이벤트 바인딩 ── */
+      bindEvents(p);
+    }
+
+    /* ── 타임라인 ── */
+    function renderTimeline(p) {
+      const row = document.getElementById('timeline-row');
+      const currentIdx = STAGES.indexOf(p.stage);
+      let html = '';
+
+      STAGES.forEach((stage, i) => {
+        const status = i < currentIdx ? 'past' : i === currentIdx ? 'current' : 'future';
+        const date   = (p.stageDates || {})[stage];
+        const dotContent = status === 'past' ? '✓' : status === 'current' ? '●' : '';
+
+        html += `
+          <div class="stage-node ${status}" data-stage="${stage}">
+            <div class="stage-dot">${dotContent}</div>
+            <div class="stage-label">${stage}</div>
+            <div class="stage-date-label">${fmtDate(date)}</div>
+          </div>`;
+
+        if (i < STAGES.length - 1) {
+          const colored = i < currentIdx;
+          html += `<div class="stage-connector${colored ? ' colored' : ''}"></div>`;
+        }
+      });
+
+      row.innerHTML = html;
+
+      row.querySelectorAll('.stage-node').forEach(node => {
+        node.addEventListener('click', function () {
+          openStageDateModal(this.dataset.stage);
+        });
+      });
+    }
+
+    /* ── 이벤트 바인딩 ── */
+    function bindEvents(p) {
+      /* 편집 버튼 */
+      const btnEdit = document.getElementById('btn-edit');
+      if (btnEdit) {
+        btnEdit.addEventListener('click', function () {
+          editSnapshot = JSON.stringify(getProject());
+          isEditMode = true;
+          render();
+        });
+      }
+
+      /* 저장 */
+      const btnSave = document.getElementById('btn-save-edit');
+      if (btnSave) {
+        btnSave.addEventListener('click', function () {
+          const updated = Object.assign({}, getProject(), {
+            client:         document.getElementById('e-client')?.value.trim() || p.client,
+            phone:          document.getElementById('e-phone')?.value.trim(),
+            address:        document.getElementById('e-address')?.value.trim(),
+            designer:       document.getElementById('e-designer')?.value.trim(),
+            amount:         document.getElementById('e-amount')?.value !== '' ? parseInt(document.getElementById('e-amount').value, 10) : null,
+            inquiryDate:    document.getElementById('e-inquiry-date')?.value || null,
+            startDate:      document.getElementById('e-start-date')?.value || null,
+            completionDate: document.getElementById('e-completion-date')?.value || null,
+            memo:           document.getElementById('e-memo')?.value.trim(),
+          });
+          updateProject(updated);
+          isEditMode = false;
+          render();
+        });
+      }
+
+      /* 편집 취소 */
+      const btnCancelEdit = document.getElementById('btn-cancel-edit');
+      if (btnCancelEdit) {
+        btnCancelEdit.addEventListener('click', function () {
+          isEditMode = false;
+          render();
+        });
+      }
+
+      /* 다음 단계 버튼 */
+      const btnNext = document.getElementById('btn-next-stage');
+      if (btnNext) {
+        btnNext.addEventListener('click', function () {
+          const bar = document.getElementById('confirm-bar');
+          const msg = document.getElementById('confirm-msg');
+          const currentIdx = STAGES.indexOf(p.stage);
+          const nextStage  = STAGES[currentIdx + 1];
+          msg.innerHTML = `<strong>${p.name}</strong>을(를) <strong>"${nextStage}"</strong> 단계로 진행합니다. 오늘 날짜가 기록됩니다.`;
+          bar.classList.add('open');
+          btnNext.disabled = true;
+        });
+      }
+
+      /* 진행 확인 */
+      const confirmYes = document.getElementById('confirm-yes');
+      if (confirmYes) {
+        confirmYes.addEventListener('click', function () {
+          const proj = getProject();
+          const currentIdx = STAGES.indexOf(proj.stage);
+          const nextStage  = STAGES[currentIdx + 1];
+          if (!nextStage) return;
+          const today = new Date().toISOString().slice(0, 10);
+          const stageDates = Object.assign({}, proj.stageDates || {}, { [nextStage]: today });
+          updateProject(Object.assign({}, proj, { stage: nextStage, stageDates }));
+          document.getElementById('confirm-bar').classList.remove('open');
+          render();
+        });
+      }
+
+      /* 진행 취소 */
+      const confirmNo = document.getElementById('confirm-no');
+      if (confirmNo) {
+        confirmNo.addEventListener('click', function () {
+          document.getElementById('confirm-bar').classList.remove('open');
+          const btnNext = document.getElementById('btn-next-stage');
+          if (btnNext) btnNext.disabled = false;
+        });
+      }
+    }
+
+    /* ── 단계 날짜 모달 ── */
+    let currentStageName = '';
+
+    function openStageDateModal(stageName) {
+      const p    = getProject();
+      const date = (p?.stageDates || {})[stageName] || '';
+      currentStageName = stageName;
+      document.getElementById('stage-modal-title').textContent = `"${stageName}" 단계 날짜 기록`;
+      document.getElementById('stage-date-input').value = date;
+      document.getElementById('stage-modal').classList.add('open');
+    }
+
+    function closeStageDateModal() {
+      document.getElementById('stage-modal').classList.remove('open');
+    }
+
+    document.getElementById('stage-modal-close').addEventListener('click', closeStageDateModal);
+    document.getElementById('stage-modal-cancel').addEventListener('click', closeStageDateModal);
+
+    document.getElementById('stage-modal').addEventListener('click', function (e) {
+      if (e.target === this) closeStageDateModal();
+    });
+
+    document.getElementById('stage-modal-save').addEventListener('click', function () {
+      const date  = document.getElementById('stage-date-input').value;
+      const proj  = getProject();
+      const stageDates = Object.assign({}, proj.stageDates || {});
+      if (date) {
+        stageDates[currentStageName] = date;
+      } else {
+        delete stageDates[currentStageName];
+      }
+      updateProject(Object.assign({}, proj, { stageDates }));
+      closeStageDateModal();
+      render();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        closeStageDateModal();
+        const bar = document.getElementById('confirm-bar');
+        if (bar) bar.classList.remove('open');
+      }
+    });
+
+    /* ── 초기 렌더 ── */
+    render();
+  </script>
+
+</body>
+</html>

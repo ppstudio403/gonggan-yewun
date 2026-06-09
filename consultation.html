@@ -199,7 +199,7 @@
       <a class="nav-item" href="projects.html"><span class="nav-icon">🏗️</span> 프로젝트 관리</a>
       <a class="nav-item active" href="consultation.html"><span class="nav-icon">📝</span> 회의록</a>
       <a class="nav-item" href="orders.html"><span class="nav-icon">📦</span> 발주서</a>
-      <button class="nav-item"><span class="nav-icon">🗓️</span> 일정</button>
+      <a class="nav-item" href="schedule.html"><span class="nav-icon">🗓️</span> 일정</a>
       <div class="nav-section-label">시스템</div>
       <button class="nav-item"><span class="nav-icon">⚙️</span> 설정</button>
     </nav>
@@ -422,6 +422,7 @@ function renderMeetingCard(m) {
       <div class="meeting-card-body">
         <div class="card-row1">
           <span class="method-badge" style="background:${ms.bg};color:${ms.color};">${esc(m.method)}</span>
+          ${m.startTime ? `<span style="font-size:12px;color:var(--text-muted);">🕐 ${esc(m.startTime)}${m.endTime ? ' — '+esc(m.endTime) : ''}</span>` : ''}
         </div>
         <div class="meeting-attendees">👥 ${esc(att.join(' · ') || '참석자 미입력')}</div>
         ${cats.length ? `<div class="meeting-topics">📋 ${esc(cats.join(' · '))}</div>` : ''}
@@ -473,6 +474,16 @@ function renderForm() {
               <option value="">프로젝트 선택</option>
               ${projOpts}
             </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">시작 시간</label>
+            <input class="form-input" id="f-start-time" type="time" value="${esc(m?.startTime || '09:00')}" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">종료 시간</label>
+            <input class="form-input" id="f-end-time" type="time" value="${esc(m?.endTime || '11:00')}" />
           </div>
         </div>
         <div class="form-group">
@@ -735,6 +746,8 @@ function saveForm() {
   const projectId = document.getElementById('f-project').value;
   const method    = document.querySelector('.method-btn.selected')?.dataset.method || '방문';
   const memo      = document.getElementById('f-memo').value.trim();
+  const startTime = document.getElementById('f-start-time')?.value || '';
+  const endTime   = document.getElementById('f-end-time')?.value   || '';
 
   if (!date || !projectId) {
     alert('날짜와 프로젝트는 필수입니다.');
@@ -745,6 +758,8 @@ function saveForm() {
     id:          editingId || ('mtg-' + Date.now()),
     projectId,
     date,
+    startTime,
+    endTime,
     method,
     attendees:   collectAttendees(),
     topics:      collectTopics(),

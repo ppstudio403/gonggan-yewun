@@ -180,6 +180,25 @@
     }
     .btn-cancel-edit:hover { background: var(--bg); }
 
+    /* ══ DELETE ZONE ══ */
+    .delete-zone {
+      padding: 18px 24px;
+      border: 1.5px solid #fecaca;
+      border-radius: var(--radius);
+      background: #fef2f2;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    }
+    .delete-zone-text { flex: 1; min-width: 0; }
+    .delete-zone-label { font-size: 13px; font-weight: 700; color: #dc2626; margin-bottom: 4px; }
+    .delete-zone-sub { font-size: 12px; color: #dc2626; opacity: .75; }
+    .btn-delete-project {
+      padding: 10px 20px; background: #dc2626; color: #fff;
+      border: none; border-radius: var(--radius-sm);
+      font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap;
+      transition: background .15s; font-family: inherit; flex-shrink: 0;
+    }
+    .btn-delete-project:hover { background: #b91c1c; }
+
     /* ══ NEXT STAGE CONFIRM BAR ══ */
     .confirm-bar {
       display: none;
@@ -471,9 +490,7 @@
           <span class="nav-icon">🗓️</span> 일정
         </a>
         <div class="nav-section-label">시스템</div>
-        <button class="nav-item">
-          <span class="nav-icon">⚙️</span> 설정
-        </button>
+        <a class="nav-item" href="settings.html"><span class="nav-icon">⚙️</span> 설정</a>
       </nav>
     </aside>
 
@@ -741,10 +758,20 @@
           <a class="btn-link" href="orders.html?project=${p.id}">
             📦 발주서 보기
           </a>
-          <a class="btn-link" href="consultation.html?project=${p.id}">
-            📝 회의록 보기
+          <a class="btn-link" href="consultation.html?new=true&projectId=${p.id}">
+            📝 회의록 작성
           </a>
         </div>
+
+        ${isEditMode ? `
+        <!-- DELETE ZONE -->
+        <div class="delete-zone">
+          <div class="delete-zone-text">
+            <div class="delete-zone-label">⚠ 위험 구역</div>
+            <div class="delete-zone-sub">프로젝트를 삭제하면 모든 데이터가 영구적으로 복구 불가합니다.</div>
+          </div>
+          <button class="btn-delete-project" id="btn-delete-project">🗑 프로젝트 삭제</button>
+        </div>` : ''}
       `;
 
       /* ── 타임라인 렌더 ── */
@@ -866,6 +893,16 @@
           document.getElementById('confirm-bar').classList.remove('open');
           const btnNext = document.getElementById('btn-next-stage');
           if (btnNext) btnNext.disabled = false;
+        });
+      }
+
+      /* 프로젝트 삭제 */
+      const btnDelProj = document.getElementById('btn-delete-project');
+      if (btnDelProj) {
+        btnDelProj.addEventListener('click', function () {
+          if (!confirm('정말 삭제하시겠습니까?\n삭제된 데이터는 복구되지 않습니다.')) return;
+          saveProjects(loadProjects().filter(p => p.id !== projectId));
+          window.location.href = 'projects.html';
         });
       }
     }

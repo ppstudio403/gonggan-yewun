@@ -129,6 +129,21 @@
     .btn-add-row:hover{background:#eeddbe;}
     .items-empty{padding:36px;text-align:center;color:var(--text-muted);font-size:13.5px;}
 
+    /* WOOD PICKER */
+    .wp-wrap{padding:12px 20px 14px;background:#fffdf9;border-bottom:1.5px solid var(--border);}
+    .wp-main-row{display:flex;gap:6px;flex-wrap:wrap;}
+    .wp-main-btn{padding:6px 14px;border:1.5px solid var(--border);border-radius:20px;background:var(--surface);font-size:12.5px;font-weight:700;color:var(--text-sub);cursor:pointer;font-family:inherit;transition:all .15s;}
+    .wp-main-btn:hover{border-color:#b45309;color:#b45309;}
+    .wp-main-btn.active{background:#b45309;border-color:#b45309;color:#fff;}
+    .wp-sub2-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:9px;padding-top:9px;border-top:1px dashed var(--border);}
+    .wp-sub2-btn{padding:5px 12px;border:1.5px solid var(--border);border-radius:20px;background:var(--surface);font-size:12px;font-weight:600;color:var(--text-muted);cursor:pointer;font-family:inherit;transition:all .15s;}
+    .wp-sub2-btn:hover{border-color:#b45309;color:#b45309;}
+    .wp-sub2-btn.active{background:#fef3c7;border-color:#b45309;color:#b45309;font-weight:700;}
+    .wp-items{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px;padding-top:9px;border-top:1px dashed var(--border);}
+    .wp-item{padding:5px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);font-size:12.5px;color:var(--text);font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s;text-align:left;}
+    .wp-item:hover{border-color:#b45309;background:#fef3c7;color:#b45309;font-weight:700;}
+    .wp-hint{margin-top:9px;padding-top:9px;border-top:1px dashed var(--border);font-size:12px;color:var(--text-muted);}
+
     /* CATEGORY BADGE */
     .cat-badge{display:inline-flex;padding:2px 9px;border-radius:12px;font-size:11.5px;font-weight:700;}
 
@@ -330,6 +345,68 @@ const CAT_STYLE={
   '기타':          'background:#f4f4f5;color:#71717a;',
 };
 
+const WOOD_ITEMS={
+  '각재':[
+    '30*30*2400 소송건조','30*30*3600 소송건조',
+    '30*69*2400 소송건조','30*69*3600 소송건조',
+  ],
+  '합판':{
+    '연질':[
+      '연질 2.7T*1,220*2,440 (동남아산/알비자)',
+      '연질 4T*1,220*2,440 (오징어/알비자)',
+      '연질 4.6T*1,220*2,440 (동남아산/알비자)',
+      '연질 8.5T*1,220*2,440 (동남아산/알비자)',
+      '연질 11.5T*1,220*2,440 (동남아산/알비자)',
+    ],
+    '중질':[
+      '중질 4.6T*1,220*2,440 (동남아산/콤비)',
+      '중질 8.5T*1,220*2,440 (동남아산/콤비)',
+      '중질 11.5T*1,220*2,440 (동남아산/콤비)',
+      '중질 14.5T*1,220*2,440 (동남아산/콤비)',
+      '중질 17.5T*1,220*2,440 (동남아산/콤비)',
+    ],
+    '강질':[
+      '강질 4T*1,220*2,440 (오징어/라왕)',
+      '강질 2.7T*1,220*2,440 (동남아산/MLH)',
+      '강질 4.6T*1,220*2,440 (동남아산/MLH)',
+      '강질 8.5T*1,220*2,440 (동남아산/MLH)',
+      '강질 11.5T*1,220*2,440 (동남아산/MLH)',
+      '강질 14.5T*1,220*2,440 (동남아산/MLH)',
+      '강질 17.5T*1,220*2,440 (동남아산/MLH)',
+    ],
+    '오쿠메':[
+      '오쿠메 4.5T*1,220*2,440 (프라임/A급)',
+      '오쿠메 9T*1,220*2,440 (프라임/A급)',
+      '오쿠메 12T*1,220*2,440 (프라임/A급)',
+      '오쿠메 15T*1,220*2,440 (프라임/A급)',
+      '오쿠메 17.5T*1,220*2,440 (프라임/A급)',
+    ],
+  },
+  'MDF':[
+    'MDF 3T*1,220*2,440','MDF 4.5T*1,220*2,440',
+    'MDF 6T*1,220*2,440','MDF 9T*1,220*2,440',
+    'MDF 12T*1,220*2,440','MDF 15T*1,220*2,440','MDF 18T*1,220*2,440',
+  ],
+  '석고보드':{
+    '일반':[
+      '일반 석고보드 9.5T*900*1,800',
+      '일반 석고보드 9.5T*900*2,400',
+      '일반 석고보드 12.5T*900*1,800',
+    ],
+    '방균':[
+      '방균 석고보드 9.5T*900*1,800',
+      '방균 석고보드 12.5T*900*1,800',
+    ],
+    '방수':['방수 석고보드 9.5T*900*1,800'],
+    '방화':['방화 석고보드 12.5T*900*1,800'],
+  },
+  '잡철물':[
+    'F50','F30','DT64','DT50','실타카630','422',
+    'ST50','ST45','ST32','ST25','반코팅장갑',
+    '목공205본드 1박스','마대 1묶음 (100장)',
+  ],
+};
+
 /* ── DATA ── */
 const INIT_ORDERS=[
   {id:'PO-2026-001',projectId:'proj-001',vendor:'삼성목재',vendorContact:'김대리',vendorPhone:'010-1234-5678',siteManager:'',siteAddress:'',orderDate:'2026-01-20',deliveryDate:'2026-02-05',status:'납품완료',
@@ -387,6 +464,8 @@ let activeVTab='select';
 let vendorCatFilter='';
 let editingVendorId=null;
 let editingManagerId=null;
+let woodSubCat=null;
+let woodSubCat2=null;
 
 /* ── ORDER INIT ── */
 function initOrderData(){
@@ -443,6 +522,7 @@ function renderCatTabs(){
     btn.addEventListener('click',function(){switchCat(this.dataset.cat);});
   });
   updateTabCounts();
+  renderWoodPicker();
 }
 
 /* ── ITEMS ── */
@@ -492,9 +572,12 @@ function addItemRow(data){
 }
 
 function switchCat(newCat){
-  saveCurrentCat();currentCat=newCat;renderItemsBody(newCat);
+  saveCurrentCat();currentCat=newCat;
+  if(newCat!=='목자재'){woodSubCat=null;woodSubCat2=null;}
+  renderItemsBody(newCat);
   document.querySelectorAll('.cat-tab').forEach(b=>b.classList.toggle('active',b.dataset.cat===newCat));
   updateTabCounts();
+  renderWoodPicker();
 }
 
 function updateTabCounts(){
@@ -504,6 +587,60 @@ function updateTabCounts(){
     const cnt=(snap[c]||[]).filter(i=>i.name||i.qty).length;
     const badge=btn.querySelector('.cat-count-badge');
     if(badge)badge.textContent=cnt||'';
+  });
+}
+
+function renderWoodPicker(){
+  const el=document.getElementById('wood-picker');
+  if(!el)return;
+  if(currentCat!=='목자재'){el.style.display='none';return;}
+  el.style.display='block';
+
+  let html='<div class="wp-wrap"><div class="wp-main-row">';
+  Object.keys(WOOD_ITEMS).forEach(c=>{
+    html+=`<button class="wp-main-btn${woodSubCat===c?' active':''}" data-wsub="${esc(c)}">${esc(c)}</button>`;
+  });
+  html+='</div>';
+
+  if(woodSubCat&&!Array.isArray(WOOD_ITEMS[woodSubCat])){
+    html+='<div class="wp-sub2-row">';
+    Object.keys(WOOD_ITEMS[woodSubCat]).forEach(c2=>{
+      html+=`<button class="wp-sub2-btn${woodSubCat2===c2?' active':''}" data-wsub2="${esc(c2)}">${esc(c2)}</button>`;
+    });
+    html+='</div>';
+  }
+
+  let items=[];
+  if(woodSubCat){
+    const cat=WOOD_ITEMS[woodSubCat];
+    if(Array.isArray(cat))items=cat;
+    else if(woodSubCat2)items=cat[woodSubCat2]||[];
+  }
+
+  if(items.length>0){
+    html+='<div class="wp-items">';
+    items.forEach(it=>{html+=`<button class="wp-item" data-witem="${esc(it)}">${esc(it)}</button>`;});
+    html+='</div>';
+  } else if(woodSubCat){
+    const cat=WOOD_ITEMS[woodSubCat];
+    html+=`<div class="wp-hint">${Array.isArray(cat)?'품목이 없습니다':'소분류를 선택하면 품목이 표시됩니다'}</div>`;
+  } else {
+    html+='<div class="wp-hint">위 버튼에서 자재 종류를 선택하면 품목 목록이 나타납니다</div>';
+  }
+
+  html+='</div>';
+  el.innerHTML=html;
+
+  el.querySelectorAll('.wp-main-btn').forEach(btn=>{
+    btn.addEventListener('click',function(){
+      woodSubCat=this.dataset.wsub;woodSubCat2=null;renderWoodPicker();
+    });
+  });
+  el.querySelectorAll('.wp-sub2-btn').forEach(btn=>{
+    btn.addEventListener('click',function(){woodSubCat2=this.dataset.wsub2;renderWoodPicker();});
+  });
+  el.querySelectorAll('.wp-item').forEach(btn=>{
+    btn.addEventListener('click',function(){addItemRow({id:newId('i'),name:this.dataset.witem});});
   });
 }
 
@@ -955,6 +1092,7 @@ function renderPage(){
         <div class="cat-tabs" id="cat-tabs">${tabsHtml}</div>
         <button class="btn-bulk" id="btn-open-bulk">일괄입력</button>
       </div>
+      <div id="wood-picker"></div>
       <div class="items-table-wrap">
         <div class="items-head">
           <div style="text-align:center;">#</div><div>품목명</div>
@@ -997,6 +1135,7 @@ function renderPage(){
   renderItemsBody(currentCat);
   updateTabCounts();
   initAutocomplete();
+  renderWoodPicker();
 }
 
 /* ── MODAL EVENTS (static) ── */

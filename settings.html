@@ -160,12 +160,59 @@
     .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--sidebar); color: #e7e5e4; padding: 12px 22px; border-radius: var(--radius-sm); font-size: 13.5px; font-weight: 600; opacity: 0; pointer-events: none; z-index: 300; white-space: nowrap; transition: opacity .2s, transform .2s; border: 1px solid #3a3330; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+    /* ── BOTTOM NAV ── */
+    .bottom-nav {
+      display: none;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 56px;
+      background: #1c1917;
+      border-top: 1px solid #292524;
+      z-index: 500;
+      flex-direction: row;
+      align-items: stretch;
+    }
+    .bnav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      color: #78716c;
+      text-decoration: none;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      background: none;
+      padding: 0;
+      font-family: inherit;
+      transition: color .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .bnav-item.active { color: #d4b483; }
+    .bnav-item:hover { color: #a8a29e; }
+    .bnav-icon { font-size: 20px; line-height: 1; }
+    .bnav-label { font-size: 10px; font-weight: 600; }
+
     /* ── RESPONSIVE ── */
-    @media (max-width: 700px) {
-      .sidebar { display: none; }
-      .content { padding: 20px; }
+    @media (max-width: 768px) {
+      .bottom-nav { display: flex; }
+      .sidebar { display: none !important; }
+      .main { padding-bottom: 64px; }
+      .content { padding: 16px !important; }
+      .header { padding: 0 16px; height: 52px; }
+      .header-brand-name { font-size: 16px; }
       .header-date { display: none; }
-      .emp-grid { grid-template-columns: 1fr; }
+      .header-user-name { display: none; }
+      .btn-logout { padding: 6px 12px; font-size: 12px; }
+      .emp-grid { grid-template-columns: 1fr !important; }
+      .perm-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .tab-bar { overflow-x: auto; }
+      .tab-btn { white-space: nowrap; }
+      .modal { max-width: 100% !important; margin: 0; border-radius: 0; max-height: 100vh; }
+      .modal-overlay { padding: 0; align-items: flex-end; }
     }
   </style>
 </head>
@@ -237,6 +284,15 @@
     </div>
   </div>
 </div>
+
+<nav class="bottom-nav">
+  <a class="bnav-item" href="dashboard.html"><span class="bnav-icon">🏠</span><span class="bnav-label">홈</span></a>
+  <a class="bnav-item" href="projects.html"><span class="bnav-icon">🏗️</span><span class="bnav-label">프로젝트</span></a>
+  <a class="bnav-item" href="consultation.html"><span class="bnav-icon">📝</span><span class="bnav-label">회의록</span></a>
+  <a class="bnav-item" href="orders.html"><span class="bnav-icon">📦</span><span class="bnav-label">발주서</span></a>
+  <a class="bnav-item" href="schedule.html"><span class="bnav-icon">🗓️</span><span class="bnav-label">일정</span></a>
+  <a class="bnav-item active" href="settings.html"><span class="bnav-icon">☰</span><span class="bnav-label">설정</span></a>
+</nav>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>

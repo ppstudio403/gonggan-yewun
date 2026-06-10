@@ -163,13 +163,65 @@
     .breadcrumb a { color:var(--accent); font-weight:600; text-decoration:none; transition:opacity .15s; }
     .breadcrumb a:hover { opacity:.75; }
 
+    /* ── BOTTOM NAV ── */
+    .bottom-nav {
+      display: none;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 56px;
+      background: #1c1917;
+      border-top: 1px solid #292524;
+      z-index: 500;
+      flex-direction: row;
+      align-items: stretch;
+    }
+    .bnav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      color: #78716c;
+      text-decoration: none;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      background: none;
+      padding: 0;
+      font-family: inherit;
+      transition: color .15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .bnav-item.active { color: #d4b483; }
+    .bnav-item:hover { color: #a8a29e; }
+    .bnav-icon { font-size: 20px; line-height: 1; }
+    .bnav-label { font-size: 10px; font-weight: 600; }
+
     /* ── RESPONSIVE ── */
-    @media (max-width:700px) {
-      .sidebar { display:none; }
-      .content { padding:20px; }
-      .form-row { grid-template-columns:1fr; }
-      .header-date { display:none; }
-      .meeting-card-date { width:70px; }
+    @media (max-width: 768px) {
+      .bottom-nav { display: flex; }
+      .sidebar { display: none !important; }
+      .main { padding-bottom: 64px; }
+      .content { padding: 16px !important; }
+      .header { padding: 0 16px; height: 52px; }
+      .header-brand-name { font-size: 16px; }
+      .header-date { display: none; }
+      .header-user-name { display: none; }
+      .btn-logout { padding: 6px 12px; font-size: 12px; }
+      .form-row { grid-template-columns: 1fr !important; }
+      .meeting-card-date { width: 70px; }
+      .toolbar { flex-wrap: wrap; }
+      .btn-new { width: 100%; justify-content: center; }
+      .form-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .form-header-right { width: 100%; justify-content: flex-end; }
+      .btn-save-form { flex: 1; }
+      .method-btns { flex-wrap: wrap; }
+      .method-btn { flex: 1; min-width: 80px; }
+      .image-grid { gap: 8px; }
+      .image-thumb, .image-upload-label { width: 76px; height: 76px; }
+      .page-title { font-size: 18px; }
     }
   </style>
 </head>
@@ -210,6 +262,15 @@
     <div class="content" id="view-container"></div>
   </main>
 </div>
+
+<nav class="bottom-nav">
+  <a class="bnav-item" href="dashboard.html"><span class="bnav-icon">🏠</span><span class="bnav-label">홈</span></a>
+  <a class="bnav-item" href="projects.html"><span class="bnav-icon">🏗️</span><span class="bnav-label">프로젝트</span></a>
+  <a class="bnav-item active" href="consultation.html"><span class="bnav-icon">📝</span><span class="bnav-label">회의록</span></a>
+  <a class="bnav-item" href="orders.html"><span class="bnav-icon">📦</span><span class="bnav-label">발주서</span></a>
+  <a class="bnav-item" href="schedule.html"><span class="bnav-icon">🗓️</span><span class="bnav-label">일정</span></a>
+  <a class="bnav-item" href="settings.html"><span class="bnav-icon">☰</span><span class="bnav-label">설정</span></a>
+</nav>
 
 <script>
 /* ════════════════════════════════════════

@@ -257,11 +257,17 @@
       color: var(--text-muted);
     }
 
+    .login-mobile-brand { display: none; text-align: center; margin-bottom: 32px; }
+    .login-mobile-logo { width: 56px; height: 56px; background: var(--accent); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 20px; font-weight: 800; color: #fff; }
+    .login-mobile-title { font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: -.3px; }
+    .login-mobile-title span { color: var(--accent); }
+
     @media (max-width: 820px) {
       .login-wrap { flex-direction: column; }
-      .login-left { padding: 40px 24px; }
-      .login-right { width: 100%; padding: 40px 24px; }
-      .login-feature-list { display: none; }
+      .login-left { display: none; }
+      .login-right { width: 100%; min-height: 100vh; padding: 40px 24px; justify-content: flex-start; padding-top: 60px; }
+      .login-mobile-brand { display: block; }
+      .login-title-sub { margin-bottom: 28px; }
     }
   </style>
 </head>
@@ -317,6 +323,10 @@
     <!-- RIGHT -->
     <div class="login-right">
       <div class="login-form-wrap">
+        <div class="login-mobile-brand">
+          <div class="login-mobile-logo">GY</div>
+          <div class="login-mobile-title">공간<span>여운</span></div>
+        </div>
         <div class="login-title">로그인</div>
         <div class="login-title-sub">공간여운 업무 계정으로 로그인하세요</div>
 
